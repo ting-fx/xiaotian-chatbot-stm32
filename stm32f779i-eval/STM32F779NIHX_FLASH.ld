@@ -46,6 +46,7 @@ MEMORY
 {
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 512K
   FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 2048K
+  SD_RAM (xrw)   : ORIGIN = 0xC0000000,    LENGTH = 8192K
 }
 
 /* Sections */
@@ -185,4 +186,9 @@ SECTIONS
   }
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
+  
+  .sd_ram :
+   {
+       *(.SD_RAM);
+   } >SD_RAM
 }

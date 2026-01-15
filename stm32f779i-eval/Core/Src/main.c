@@ -135,6 +135,17 @@ int main(void)
   MX_USB_OTG_HS_PCD_Init();
   /* USER CODE BEGIN 2 */
 
+  audio_rec();
+
+  AUDIO_DATA data;
+
+  while(audio_record_buffer_get(&data) != STATUS_SUCCESS)
+  {
+	  HAL_Delay(500);
+  }
+
+  audio_play(&data);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

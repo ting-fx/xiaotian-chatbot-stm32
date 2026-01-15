@@ -28,6 +28,9 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f7xx_hal.h"
+#include "stm32f769i_eval.h"
+#include "stm32f769i_eval_audio.h"
+#include "audio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -46,6 +49,16 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+
+/* Define status. */
+#define STATUS_SUCCESS              0
+#define STATUS_FAILURE              1
+
+/* Audio status. */
+#define STATUS_AUDIO_INIT_FAILURE   0x0010
+#define STATUS_AUDIO_PLAY_FAILURE   0x0020
+#define STATUS_AUDIO_RECORD_FAILURE 0x0030
+#define STATUS_AUDIO_NULL_PTR       0x0040
 
 /* USER CODE END EM */
 
