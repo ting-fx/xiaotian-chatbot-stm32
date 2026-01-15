@@ -7,7 +7,7 @@
 
 typedef struct AUDIO_DATA_STRUCT{
 	uint16_t *data_ptr;
-	uint16_t *size;
+	uint32_t size;
 }AUDIO_DATA;
 
 uint8_t audio_record();

@@ -3,7 +3,7 @@
 #define PCM_BUFFER_SIZE     1024
 
 static uint16_t pcm_buffer[PCM_BUFFER_SIZE * 2]; // 双声道
-static int16_t *play_data = NULL;
+static uint16_t *play_data = NULL;
 static uint32_t play_data_size = 0; // 样本数
 static uint32_t play_size = 0;
 
