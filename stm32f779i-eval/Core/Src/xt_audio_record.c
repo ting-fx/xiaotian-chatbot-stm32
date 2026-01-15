@@ -15,9 +15,9 @@ static uint32_t record_buffer_size = 0;
 static uint8_t record_state = RECORD_STATE_IDLE;
 
 void BSP_AUDIO_IN_TransferComplete_CallBack(void) {
-	memcpy(record_buffer + record_buffer_size, pcm_buffer + PCM_BUFFER_SIZE / 2, PCM_BUFFER_SIZE * sizeof(uint16_t));
+	memcpy(record_buffer + record_buffer_size, pcm_buffer + PCM_BUFFER_SIZE, PCM_BUFFER_SIZE * sizeof(uint16_t));
 
-	record_buffer_size += PCM_BUFFER_SIZE / 2;
+	record_buffer_size += PCM_BUFFER_SIZE;
 
 	if(record_buffer_size >= RECORD_BUFFER_SIZE)
 	{
@@ -29,7 +29,7 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(void) {
 void BSP_AUDIO_IN_HalfTransfer_CallBack(void) {
 	memcpy(record_buffer + record_buffer_size, pcm_buffer, PCM_BUFFER_SIZE * sizeof(uint16_t));
 
-	record_buffer_size += PCM_BUFFER_SIZE / 2;
+	record_buffer_size += PCM_BUFFER_SIZE;
 
 	if(record_buffer_size >= RECORD_BUFFER_SIZE)
 	{
