@@ -1,7 +1,8 @@
 #include "main.h"
 
-#define PCM_BUFFER_SIZE       1024
-#define RECORD_BUFFER_SIZE    409600
+#define PCM_BUFFER_SIZE         1024
+#define RECORD_BUFFER_SIZE      102400
+#define SCRATCH_BUFF_SIZE       512
 
 #define RECORD_STATE_IDLE       0
 #define RECORD_STATE_RECORDING  1
@@ -9,6 +10,7 @@
 
 static uint16_t pcm_buffer[PCM_BUFFER_SIZE * 2]; // 双声道
 static __attribute__((section(".SD_RAM"))) uint16_t record_buffer[RECORD_BUFFER_SIZE];
+static int32_t Scratch[SCRATCH_BUFF_SIZE];
 static uint32_t record_buffer_size = 0;
 static uint8_t record_state = RECORD_STATE_IDLE;
 
@@ -52,7 +54,13 @@ uint8_t status;
 		return STATUS_AUDIO_INIT_FAILURE;
 	}
 
-	status = BSP_AUDIO_IN_Record((uint16_t *)pcm_buffer, PCM_BUFFER_SIZE * sizeof(uint16_t) * 2);
+    status = BSP_AUDIO_IN_AllocScratch(Scratch, SCRATCH_BUFF_SIZE);
+
+    if(status != AUDIO_OK)
+    {
+        return STATUS_FAILURE;
+    }
+	status = BSP_AUDIO_IN_Record((uint16_t *)pcm_buffer, PCM_BUFFER_SIZE * 2);
 
 	if(status != AUDIO_OK)
 	{

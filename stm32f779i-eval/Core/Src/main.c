@@ -51,14 +51,9 @@ QSPI_HandleTypeDef hqspi;
 SAI_HandleTypeDef hsai_BlockA1;
 SAI_HandleTypeDef hsai_BlockB2;
 
-MMC_HandleTypeDef hmmc1;
-
 SPDIFRX_HandleTypeDef hspdif;
 
 UART_HandleTypeDef huart1;
-
-PCD_HandleTypeDef hpcd_USB_OTG_FS;
-PCD_HandleTypeDef hpcd_USB_OTG_HS;
 
 NOR_HandleTypeDef hnor1;
 SRAM_HandleTypeDef hsram2;
@@ -78,11 +73,8 @@ static void MX_FMC_Init(void);
 static void MX_QUADSPI_Init(void);
 static void MX_SAI1_Init(void);
 static void MX_SAI2_Init(void);
-static void MX_SDMMC1_MMC_Init(void);
 static void MX_SPDIFRX_Init(void);
 static void MX_USART1_UART_Init(void);
-static void MX_USB_OTG_FS_PCD_Init(void);
-static void MX_USB_OTG_HS_PCD_Init(void);
 static void MX_DFSDM1_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -97,6 +89,8 @@ static void MX_DFSDM1_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
+extern const int16_t audio_data[];
+extern const unsigned int audio_data_len;
 int main(void)
 {
 
@@ -110,7 +104,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  BSP_SDRAM_Init();
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -131,17 +125,18 @@ int main(void)
   MX_QUADSPI_Init();
   MX_SAI1_Init();
   MX_SAI2_Init();
-  MX_SDMMC1_MMC_Init();
   MX_SPDIFRX_Init();
   MX_USART1_UART_Init();
-  MX_USB_OTG_FS_PCD_Init();
-  MX_USB_OTG_HS_PCD_Init();
-  MX_DFSDM1_Init();
   /* USER CODE BEGIN 2 */
 
-  audio_record();
-
   AUDIO_DATA data;
+
+//  data.data_ptr = audio_data + 22;
+//  data.size = audio_data_len - 22;
+//  audio_play(&data);
+//
+//  while(1);
+  audio_record();
 
   while(audio_record_buffer_get(&data) != STATUS_SUCCESS)
   {
@@ -223,8 +218,7 @@ void PeriphCommonClock_Config(void)
 
   /** Initializes the peripherals clock
   */
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_SAI2
-                              |RCC_PERIPHCLK_CLK48;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_SAI2;
   PeriphClkInitStruct.PLLSAI.PLLSAIN = 192;
   PeriphClkInitStruct.PLLSAI.PLLSAIR = 2;
   PeriphClkInitStruct.PLLSAI.PLLSAIQ = 3;
@@ -538,42 +532,6 @@ static void MX_SAI2_Init(void)
 }
 
 /**
-  * @brief SDMMC1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SDMMC1_MMC_Init(void)
-{
-
-  /* USER CODE BEGIN SDMMC1_Init 0 */
-
-  /* USER CODE END SDMMC1_Init 0 */
-
-  /* USER CODE BEGIN SDMMC1_Init 1 */
-
-  /* USER CODE END SDMMC1_Init 1 */
-  hmmc1.Instance = SDMMC1;
-  hmmc1.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
-  hmmc1.Init.ClockBypass = SDMMC_CLOCK_BYPASS_DISABLE;
-  hmmc1.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
-  hmmc1.Init.BusWide = SDMMC_BUS_WIDE_1B;
-  hmmc1.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
-  hmmc1.Init.ClockDiv = 0;
-  if (HAL_MMC_Init(&hmmc1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_MMC_ConfigWideBusOperation(&hmmc1, SDMMC_BUS_WIDE_4B) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SDMMC1_Init 2 */
-
-  /* USER CODE END SDMMC1_Init 2 */
-
-}
-
-/**
   * @brief SPDIFRX Initialization Function
   * @param None
   * @retval None
@@ -641,77 +599,6 @@ static void MX_USART1_UART_Init(void)
   /* USER CODE BEGIN USART1_Init 2 */
 
   /* USER CODE END USART1_Init 2 */
-
-}
-
-/**
-  * @brief USB_OTG_FS Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USB_OTG_FS_PCD_Init(void)
-{
-
-  /* USER CODE BEGIN USB_OTG_FS_Init 0 */
-
-  /* USER CODE END USB_OTG_FS_Init 0 */
-
-  /* USER CODE BEGIN USB_OTG_FS_Init 1 */
-
-  /* USER CODE END USB_OTG_FS_Init 1 */
-  hpcd_USB_OTG_FS.Instance = USB_OTG_FS;
-  hpcd_USB_OTG_FS.Init.dev_endpoints = 6;
-  hpcd_USB_OTG_FS.Init.speed = PCD_SPEED_FULL;
-  hpcd_USB_OTG_FS.Init.dma_enable = DISABLE;
-  hpcd_USB_OTG_FS.Init.phy_itface = PCD_PHY_EMBEDDED;
-  hpcd_USB_OTG_FS.Init.Sof_enable = DISABLE;
-  hpcd_USB_OTG_FS.Init.low_power_enable = DISABLE;
-  hpcd_USB_OTG_FS.Init.lpm_enable = DISABLE;
-  hpcd_USB_OTG_FS.Init.vbus_sensing_enable = DISABLE;
-  hpcd_USB_OTG_FS.Init.use_dedicated_ep1 = DISABLE;
-  if (HAL_PCD_Init(&hpcd_USB_OTG_FS) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USB_OTG_FS_Init 2 */
-
-  /* USER CODE END USB_OTG_FS_Init 2 */
-
-}
-
-/**
-  * @brief USB_OTG_HS Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USB_OTG_HS_PCD_Init(void)
-{
-
-  /* USER CODE BEGIN USB_OTG_HS_Init 0 */
-
-  /* USER CODE END USB_OTG_HS_Init 0 */
-
-  /* USER CODE BEGIN USB_OTG_HS_Init 1 */
-
-  /* USER CODE END USB_OTG_HS_Init 1 */
-  hpcd_USB_OTG_HS.Instance = USB_OTG_HS;
-  hpcd_USB_OTG_HS.Init.dev_endpoints = 9;
-  hpcd_USB_OTG_HS.Init.speed = PCD_SPEED_HIGH;
-  hpcd_USB_OTG_HS.Init.dma_enable = DISABLE;
-  hpcd_USB_OTG_HS.Init.phy_itface = USB_OTG_ULPI_PHY;
-  hpcd_USB_OTG_HS.Init.Sof_enable = DISABLE;
-  hpcd_USB_OTG_HS.Init.low_power_enable = DISABLE;
-  hpcd_USB_OTG_HS.Init.lpm_enable = DISABLE;
-  hpcd_USB_OTG_HS.Init.vbus_sensing_enable = DISABLE;
-  hpcd_USB_OTG_HS.Init.use_dedicated_ep1 = DISABLE;
-  hpcd_USB_OTG_HS.Init.use_external_vbus = DISABLE;
-  if (HAL_PCD_Init(&hpcd_USB_OTG_HS) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USB_OTG_HS_Init 2 */
-
-  /* USER CODE END USB_OTG_HS_Init 2 */
 
 }
 
@@ -889,6 +776,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : ULPI_D7_Pin ULPI_D6_Pin ULPI_D5_Pin ULPI_D3_Pin
+                           ULPI_D2_Pin ULPI_D1_Pin ULPI_D4_Pin */
+  GPIO_InitStruct.Pin = ULPI_D7_Pin|ULPI_D6_Pin|ULPI_D5_Pin|ULPI_D3_Pin
+                          |ULPI_D2_Pin|ULPI_D1_Pin|ULPI_D4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF10_OTG_HS;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
   /*Configure GPIO pins : SD2_D3_Pin SD2_D2_Pin */
   GPIO_InitStruct.Pin = SD2_D3_Pin|SD2_D2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -904,6 +801,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF11_SDMMC2;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : SD1_CLK_Pin SD1_D3_Pin SD1_D2_Pin SD1_D1_Pin
+                           SD1_D0_Pin */
+  GPIO_InitStruct.Pin = SD1_CLK_Pin|SD1_D3_Pin|SD1_D2_Pin|SD1_D1_Pin
+                          |SD1_D0_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF12_SDMMC1;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PAR_VSYNC_Pin */
   GPIO_InitStruct.Pin = PAR_VSYNC_Pin;
@@ -921,6 +828,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOJ, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : USB_FS1_DP_Pin USB_FS1_DM_Pin */
+  GPIO_InitStruct.Pin = USB_FS1_DP_Pin|USB_FS1_DM_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : EXPANDER_INT_Pin */
   GPIO_InitStruct.Pin = EXPANDER_INT_Pin;
@@ -968,6 +883,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(TAMPER_WKUP_KEY_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : SD1_CMD_Pin */
+  GPIO_InitStruct.Pin = SD1_CMD_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF12_SDMMC1;
+  HAL_GPIO_Init(SD1_CMD_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : LCD_HSYNC_Pin LCD_VSYNC_Pin LCD_CLK_Pin */
   GPIO_InitStruct.Pin = LCD_HSYNC_Pin|LCD_VSYNC_Pin|LCD_CLK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -975,6 +898,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
   HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : ULPI_DIR_Pin */
+  GPIO_InitStruct.Pin = ULPI_DIR_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF10_OTG_HS;
+  HAL_GPIO_Init(ULPI_DIR_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : MII_MCO_Pin */
   GPIO_InitStruct.Pin = MII_MCO_Pin;
@@ -991,6 +922,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED0_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : ULPI_NXT_Pin */
+  GPIO_InitStruct.Pin = ULPI_NXT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF10_OTG_HS;
+  HAL_GPIO_Init(ULPI_NXT_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : MII_TX_CLK_Pin MII_TXD2_Pin MII_RXD0_Pin MII_RXD1_Pin */
   GPIO_InitStruct.Pin = MII_TX_CLK_Pin|MII_TXD2_Pin|MII_RXD0_Pin|MII_RXD1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -998,6 +937,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : ULPI_STP_Pin */
+  GPIO_InitStruct.Pin = ULPI_STP_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF10_OTG_HS;
+  HAL_GPIO_Init(ULPI_STP_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : MII_RX_CLK_Pin MII_RX_DV_Pin */
   GPIO_InitStruct.Pin = MII_RX_CLK_Pin|MII_RX_DV_Pin;
@@ -1022,6 +969,22 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
   HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : ULPI_CK_Pin ULPI_D0_Pin */
+  GPIO_InitStruct.Pin = ULPI_CK_Pin|ULPI_D0_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF10_OTG_HS;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : USB_FS2_DM_Pin USB_FS2_DP_Pin */
+  GPIO_InitStruct.Pin = USB_FS2_DM_Pin|USB_FS2_DP_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF12_OTG_HS_FS;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
