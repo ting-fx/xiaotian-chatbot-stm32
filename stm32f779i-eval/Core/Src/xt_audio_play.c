@@ -45,7 +45,7 @@ uint8_t audio_play(AUDIO_DATA *audio_data)
 
     // 初始化前半缓冲
     memcpy(pcm_buffer, play_data, sizeof(uint16_t) * PCM_BUFFER_SIZE);
-    playsize += PCM_BUFFER_SIZE / 2;
+    play_size += PCM_BUFFER_SIZE / 2;
 
     // 配置两个slot
     BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);
@@ -55,7 +55,7 @@ uint8_t audio_play(AUDIO_DATA *audio_data)
 
     if(status != AUDIO_OK)
     {
-    	return STATUS_AUDIO_PALY_FAILURE;
+    	return STATUS_AUDIO_PLAY_FAILURE;
     }
 
     return STATUS_SUCCESS;

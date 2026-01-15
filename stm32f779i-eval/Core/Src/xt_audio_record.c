@@ -19,7 +19,7 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(void) {
 
 	if(record_buffer_size >= RECORD_BUFFER_SIZE)
 	{
-		BSP_AUDIO_IN_Stop(CODEC_PDWN_SW);
+		BSP_AUDIO_IN_Stop();
 		record_state = RECORD_STATE_COMPLETED;
 	}
 }
@@ -31,7 +31,7 @@ void BSP_AUDIO_IN_HalfTransfer_CallBack(void) {
 
 	if(record_buffer_size >= RECORD_BUFFER_SIZE)
 	{
-		BSP_AUDIO_IN_Stop(CODEC_PDWN_SW);
+		BSP_AUDIO_IN_Stop();
 		record_state = RECORD_STATE_COMPLETED;
 	}
 }

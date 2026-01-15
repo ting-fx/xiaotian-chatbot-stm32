@@ -139,6 +139,65 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 
 }
 
+static uint32_t DFSDM1_Init = 0;
+/**
+  * @brief DFSDM_Channel MSP Initialization
+  * This function configures the hardware resources used in this example
+  * @param hdfsdm_channel: DFSDM_Channel handle pointer
+  * @retval None
+  */
+void HAL_DFSDM_ChannelMspInit(DFSDM_Channel_HandleTypeDef* hdfsdm_channel)
+{
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+  if(DFSDM1_Init == 0)
+  {
+    /* USER CODE BEGIN DFSDM1_MspInit 0 */
+
+    /* USER CODE END DFSDM1_MspInit 0 */
+
+  /** Initializes the peripherals clock
+  */
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_DFSDM1;
+    PeriphClkInitStruct.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_PCLK;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    /* Peripheral clock enable */
+    __HAL_RCC_DFSDM1_CLK_ENABLE();
+    /* USER CODE BEGIN DFSDM1_MspInit 1 */
+
+    /* USER CODE END DFSDM1_MspInit 1 */
+
+  DFSDM1_Init++;
+  }
+
+}
+
+/**
+  * @brief DFSDM_Channel MSP De-Initialization
+  * This function freeze the hardware resources used in this example
+  * @param hdfsdm_channel: DFSDM_Channel handle pointer
+  * @retval None
+  */
+void HAL_DFSDM_ChannelMspDeInit(DFSDM_Channel_HandleTypeDef* hdfsdm_channel)
+{
+  DFSDM1_Init-- ;
+  if(DFSDM1_Init == 0)
+    {
+    /* USER CODE BEGIN DFSDM1_MspDeInit 0 */
+
+    /* USER CODE END DFSDM1_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_DFSDM1_CLK_DISABLE();
+    /* USER CODE BEGIN DFSDM1_MspDeInit 1 */
+
+    /* USER CODE END DFSDM1_MspDeInit 1 */
+  }
+
+}
+
 /**
   * @brief DSI MSP Initialization
   * This function configures the hardware resources used in this example

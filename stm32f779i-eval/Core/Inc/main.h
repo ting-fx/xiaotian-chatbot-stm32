@@ -28,12 +28,10 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f7xx_hal.h"
-#include "stm32f769i_eval.h"
-#include "stm32f769i_eval_audio.h"
-#include "audio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "xt_audio.h"
 
 /* USER CODE END Includes */
 
