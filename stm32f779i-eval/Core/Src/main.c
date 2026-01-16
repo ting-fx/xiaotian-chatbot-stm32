@@ -48,10 +48,7 @@ DSI_HandleTypeDef hdsi;
 
 QSPI_HandleTypeDef hqspi;
 
-SAI_HandleTypeDef hsai_BlockA1;
 SAI_HandleTypeDef hsai_BlockB2;
-
-SPDIFRX_HandleTypeDef hspdif;
 
 UART_HandleTypeDef huart1;
 
@@ -65,15 +62,12 @@ SDRAM_HandleTypeDef hsdram1;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void PeriphCommonClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC3_Init(void);
 static void MX_DSIHOST_DSI_Init(void);
 static void MX_FMC_Init(void);
 static void MX_QUADSPI_Init(void);
-static void MX_SAI1_Init(void);
 static void MX_SAI2_Init(void);
-static void MX_SPDIFRX_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_DFSDM1_Init(void);
 /* USER CODE BEGIN PFP */
@@ -89,8 +83,6 @@ static void MX_DFSDM1_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-extern const int16_t audio_data[];
-extern const unsigned int audio_data_len;
 int main(void)
 {
 
@@ -110,9 +102,6 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
-  /* Configure the peripherals common clocks */
-  PeriphCommonClock_Config();
-
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -123,9 +112,6 @@ int main(void)
   MX_DSIHOST_DSI_Init();
   MX_FMC_Init();
   MX_QUADSPI_Init();
-  MX_SAI1_Init();
-  MX_SAI2_Init();
-  MX_SPDIFRX_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
@@ -203,31 +189,6 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
-/**
-  * @brief Peripherals Common Clock Configuration
-  * @retval None
-  */
-void PeriphCommonClock_Config(void)
-{
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
-
-  /** Initializes the peripherals clock
-  */
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SAI1|RCC_PERIPHCLK_SAI2;
-  PeriphClkInitStruct.PLLSAI.PLLSAIN = 192;
-  PeriphClkInitStruct.PLLSAI.PLLSAIR = 2;
-  PeriphClkInitStruct.PLLSAI.PLLSAIQ = 3;
-  PeriphClkInitStruct.PLLSAI.PLLSAIP = RCC_PLLSAIP_DIV2;
-  PeriphClkInitStruct.PLLSAIDivQ = 1;
-  PeriphClkInitStruct.PLLSAIDivR = RCC_PLLSAIDIVR_2;
-  PeriphClkInitStruct.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLLSAI;
-  PeriphClkInitStruct.Sai2ClockSelection = RCC_SAI2CLKSOURCE_PLLSAI;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
@@ -449,40 +410,6 @@ static void MX_QUADSPI_Init(void)
 }
 
 /**
-  * @brief SAI1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SAI1_Init(void)
-{
-
-  /* USER CODE BEGIN SAI1_Init 0 */
-
-  /* USER CODE END SAI1_Init 0 */
-
-  /* USER CODE BEGIN SAI1_Init 1 */
-
-  /* USER CODE END SAI1_Init 1 */
-  hsai_BlockA1.Instance = SAI1_Block_A;
-  hsai_BlockA1.Init.Protocol = SAI_SPDIF_PROTOCOL;
-  hsai_BlockA1.Init.AudioMode = SAI_MODEMASTER_TX;
-  hsai_BlockA1.Init.Synchro = SAI_ASYNCHRONOUS;
-  hsai_BlockA1.Init.OutputDrive = SAI_OUTPUTDRIVE_DISABLE;
-  hsai_BlockA1.Init.FIFOThreshold = SAI_FIFOTHRESHOLD_EMPTY;
-  hsai_BlockA1.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_48K;
-  hsai_BlockA1.Init.MonoStereoMode = SAI_STEREOMODE;
-  hsai_BlockA1.Init.CompandingMode = SAI_NOCOMPANDING;
-  if (HAL_SAI_Init(&hsai_BlockA1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SAI1_Init 2 */
-
-  /* USER CODE END SAI1_Init 2 */
-
-}
-
-/**
   * @brief SAI2 Initialization Function
   * @param None
   * @retval None
@@ -528,42 +455,6 @@ static void MX_SAI2_Init(void)
   /* USER CODE BEGIN SAI2_Init 2 */
 
   /* USER CODE END SAI2_Init 2 */
-
-}
-
-/**
-  * @brief SPDIFRX Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPDIFRX_Init(void)
-{
-
-  /* USER CODE BEGIN SPDIFRX_Init 0 */
-
-  /* USER CODE END SPDIFRX_Init 0 */
-
-  /* USER CODE BEGIN SPDIFRX_Init 1 */
-
-  /* USER CODE END SPDIFRX_Init 1 */
-  hspdif.Instance = SPDIFRX;
-  hspdif.Init.InputSelection = SPDIFRX_INPUT_IN1;
-  hspdif.Init.Retries = SPDIFRX_MAXRETRIES_NONE;
-  hspdif.Init.WaitForActivity = SPDIFRX_WAITFORACTIVITY_OFF;
-  hspdif.Init.ChannelSelection = SPDIFRX_CHANNEL_A;
-  hspdif.Init.DataFormat = SPDIFRX_DATAFORMAT_LSB;
-  hspdif.Init.StereoMode = SPDIFRX_STEREOMODE_DISABLE;
-  hspdif.Init.PreambleTypeMask = SPDIFRX_PREAMBLETYPEMASK_OFF;
-  hspdif.Init.ChannelStatusMask = SPDIFRX_CHANNELSTATUS_OFF;
-  hspdif.Init.ValidityBitMask = SPDIFRX_VALIDITYMASK_OFF;
-  hspdif.Init.ParityErrorMask = SPDIFRX_PARITYERRORMASK_OFF;
-  if (HAL_SPDIFRX_Init(&hspdif) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPDIFRX_Init 2 */
-
-  /* USER CODE END SPDIFRX_Init 2 */
 
 }
 
@@ -853,6 +744,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
   HAL_GPIO_Init(GPIOK, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : SPDIF_RX1_Pin */
+  GPIO_InitStruct.Pin = SPDIF_RX1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Alternate = GPIO_AF7_SPDIFRX;
+  HAL_GPIO_Init(SPDIF_RX1_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pin : SD2_D1_Pin */
   GPIO_InitStruct.Pin = SD2_D1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -945,6 +844,14 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF10_OTG_HS;
   HAL_GPIO_Init(ULPI_STP_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SAI1_SDA_Pin */
+  GPIO_InitStruct.Pin = SAI1_SDA_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Alternate = GPIO_AF6_SAI1;
+  HAL_GPIO_Init(SAI1_SDA_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : MII_RX_CLK_Pin MII_RX_DV_Pin */
   GPIO_InitStruct.Pin = MII_RX_CLK_Pin|MII_RX_DV_Pin;

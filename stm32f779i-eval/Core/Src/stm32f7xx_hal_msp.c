@@ -361,85 +361,6 @@ void HAL_QSPI_MspDeInit(QSPI_HandleTypeDef* hqspi)
 }
 
 /**
-  * @brief SPDIFRX MSP Initialization
-  * This function configures the hardware resources used in this example
-  * @param hspdifrx: SPDIFRX handle pointer
-  * @retval None
-  */
-void HAL_SPDIFRX_MspInit(SPDIFRX_HandleTypeDef* hspdifrx)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
-  if(hspdifrx->Instance==SPDIFRX)
-  {
-    /* USER CODE BEGIN SPDIFRX_MspInit 0 */
-
-    /* USER CODE END SPDIFRX_MspInit 0 */
-
-  /** Initializes the peripherals clock
-  */
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SPDIFRX;
-    PeriphClkInitStruct.PLLI2S.PLLI2SN = 192;
-    PeriphClkInitStruct.PLLI2S.PLLI2SP = RCC_PLLP_DIV2;
-    PeriphClkInitStruct.PLLI2S.PLLI2SR = 2;
-    PeriphClkInitStruct.PLLI2S.PLLI2SQ = 2;
-    PeriphClkInitStruct.PLLI2SDivQ = 1;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    /* Peripheral clock enable */
-    __HAL_RCC_SPDIFRX_CLK_ENABLE();
-
-    __HAL_RCC_GPIOG_CLK_ENABLE();
-    /**SPDIFRX GPIO Configuration
-    PG12     ------> SPDIFRX_IN1
-    */
-    GPIO_InitStruct.Pin = SPDIF_RX1_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF7_SPDIFRX;
-    HAL_GPIO_Init(SPDIF_RX1_GPIO_Port, &GPIO_InitStruct);
-
-    /* USER CODE BEGIN SPDIFRX_MspInit 1 */
-
-    /* USER CODE END SPDIFRX_MspInit 1 */
-
-  }
-
-}
-
-/**
-  * @brief SPDIFRX MSP De-Initialization
-  * This function freeze the hardware resources used in this example
-  * @param hspdifrx: SPDIFRX handle pointer
-  * @retval None
-  */
-void HAL_SPDIFRX_MspDeInit(SPDIFRX_HandleTypeDef* hspdifrx)
-{
-  if(hspdifrx->Instance==SPDIFRX)
-  {
-    /* USER CODE BEGIN SPDIFRX_MspDeInit 0 */
-
-    /* USER CODE END SPDIFRX_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_SPDIFRX_CLK_DISABLE();
-
-    /**SPDIFRX GPIO Configuration
-    PG12     ------> SPDIFRX_IN1
-    */
-    HAL_GPIO_DeInit(SPDIF_RX1_GPIO_Port, SPDIF_RX1_Pin);
-
-    /* USER CODE BEGIN SPDIFRX_MspDeInit 1 */
-
-    /* USER CODE END SPDIFRX_MspDeInit 1 */
-  }
-
-}
-
-/**
   * @brief UART MSP Initialization
   * This function configures the hardware resources used in this example
   * @param huart: UART handle pointer
@@ -851,38 +772,33 @@ void HAL_SDRAM_MspDeInit(SDRAM_HandleTypeDef* hsdram){
   /* USER CODE END SDRAM_MspDeInit 1 */
 }
 
-static uint32_t SAI1_client =0;
 static uint32_t SAI2_client =0;
 
 void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct;
-/* SAI1 */
-    if(hsai->Instance==SAI1_Block_A)
-    {
-    /* Peripheral clock enable */
-    if (SAI1_client == 0)
-    {
-       __HAL_RCC_SAI1_CLK_ENABLE();
-    }
-    SAI1_client ++;
-
-    /**SAI1_A_Block_A GPIO Configuration
-    PC1     ------> SAI1_SD_A
-    */
-    GPIO_InitStruct.Pin = SAI1_SDA_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF6_SAI1;
-    HAL_GPIO_Init(SAI1_SDA_GPIO_Port, &GPIO_InitStruct);
-
-    }
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 /* SAI2 */
     if(hsai->Instance==SAI2_Block_B)
     {
       /* Peripheral clock enable */
+
+  /** Initializes the peripherals clock
+  */
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SAI2;
+    PeriphClkInitStruct.PLLSAI.PLLSAIN = 192;
+    PeriphClkInitStruct.PLLSAI.PLLSAIR = 2;
+    PeriphClkInitStruct.PLLSAI.PLLSAIQ = 3;
+    PeriphClkInitStruct.PLLSAI.PLLSAIP = RCC_PLLSAIP_DIV2;
+    PeriphClkInitStruct.PLLSAIDivQ = 1;
+    PeriphClkInitStruct.PLLSAIDivR = RCC_PLLSAIDIVR_2;
+    PeriphClkInitStruct.Sai2ClockSelection = RCC_SAI2CLKSOURCE_PLLSAI;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
       if (SAI2_client == 0)
       {
        __HAL_RCC_SAI2_CLK_ENABLE();
@@ -928,22 +844,6 @@ void HAL_SAI_MspInit(SAI_HandleTypeDef* hsai)
 
 void HAL_SAI_MspDeInit(SAI_HandleTypeDef* hsai)
 {
-/* SAI1 */
-    if(hsai->Instance==SAI1_Block_A)
-    {
-    SAI1_client --;
-    if (SAI1_client == 0)
-      {
-      /* Peripheral clock disable */
-       __HAL_RCC_SAI1_CLK_DISABLE();
-      }
-
-    /**SAI1_A_Block_A GPIO Configuration
-    PC1     ------> SAI1_SD_A
-    */
-    HAL_GPIO_DeInit(SAI1_SDA_GPIO_Port, SAI1_SDA_Pin);
-
-    }
 /* SAI2 */
     if(hsai->Instance==SAI2_Block_B)
     {
