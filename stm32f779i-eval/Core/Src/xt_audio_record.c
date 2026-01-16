@@ -2,9 +2,7 @@
 
 /* ========================= 缓冲区与状态定义 ========================= */
 
-/* DMA 单次传输的 PCM buffer 大小（单位：uint16_t 样本数）
- * 实际 DMA 使用的是双缓冲，因此总大小为 PCM_BUFFER_SIZE * 2
- */
+/* DMA使用的音频数据缓冲区大小 */
 #define PCM_BUFFER_SIZE         1024
 
 /* 最终录音数据缓存大小（单位：uint16_t 样本数）
@@ -12,9 +10,7 @@
  */
 #define RECORD_BUFFER_SIZE      409600
 
-/* DFSDM / BSP Audio 使用的 Scratch buffer
- * 用于内部滤波或中间运算
- */
+/* DFSDM 使用的 Scratch buffer，用于内部滤波或中间运算 */
 #define SCRATCH_BUFF_SIZE       512
 
 /* 录音状态机定义 */
@@ -24,11 +20,7 @@
 
 /* ========================= 全局静态变量 ========================= */
 
-/* DMA 使用的 PCM 环形缓冲区
- * 大小为 2 * PCM_BUFFER_SIZE：
- *   - 前一半：HalfTransfer 回调使用
- *   - 后一半：TransferComplete 回调使用
- */
+/* DMA 使用的音频数据缓冲区 */
 static uint16_t pcm_buffer[PCM_BUFFER_SIZE * 2];
 
 /* 最终录音数据缓存，放在 SDRAM 中
@@ -37,7 +29,7 @@ static uint16_t pcm_buffer[PCM_BUFFER_SIZE * 2];
 static __attribute__((section(".SD_RAM")))
 uint16_t record_buffer[RECORD_BUFFER_SIZE];
 
-/* BSP Audio / DFSDM 使用的 Scratch buffer */
+/* DFSDM 使用的 Scratch buffer */
 static int32_t Scratch[SCRATCH_BUFF_SIZE];
 
 /* 当前已录入的样本数（单位：uint16_t） */
@@ -105,8 +97,7 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(void)
 /**
  * @brief 启动录音
  *
- * 初始化音频输入外设（DFSDM / SAI），
- * 并启动 DMA 录音到 pcm_buffer
+ * 初始化音频输入并启动录音到 pcm_buffer
  */
 uint8_t audio_record(void)
 {
@@ -118,11 +109,7 @@ uint8_t audio_record(void)
     /* 设置状态为录音中 */
     record_state = RECORD_STATE_RECORDING;
 
-    /* 初始化音频输入参数：
-     * - 采样率
-     * - 位宽
-     * - 通道数
-     */
+    /* 初始化音频输入参数：采样率、位宽、通道数 */
     status = BSP_AUDIO_IN_Init(DEFAULT_AUDIO_IN_FREQ,
                                DEFAULT_AUDIO_IN_BIT_RESOLUTION,
                                DEFAULT_AUDIO_IN_CHANNEL_NBR);
@@ -131,16 +118,14 @@ uint8_t audio_record(void)
         return STATUS_AUDIO_INIT_FAILURE;
     }
 
-    /* 分配 DFSDM / BSP Audio 使用的 Scratch buffer */
+    /* 分配 DFSDM 使用的 Scratch buffer */
     status = BSP_AUDIO_IN_AllocScratch(Scratch, SCRATCH_BUFF_SIZE);
     if(status != AUDIO_OK)
     {
         return STATUS_FAILURE;
     }
 
-    /* 启动 DMA 录音
-     * DMA 会循环写入 pcm_buffer（双缓冲）
-     */
+    /* 启动 DMA 录音，DMA 会循环写入 pcm_buffer */
     status = BSP_AUDIO_IN_Record((uint16_t *)pcm_buffer,
                                  PCM_BUFFER_SIZE * 2);
     if(status != AUDIO_OK)

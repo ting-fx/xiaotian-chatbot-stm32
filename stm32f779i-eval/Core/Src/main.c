@@ -88,15 +88,9 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
 
-  AUDIO_DATA data;
-
-//  data.data_ptr = audio_data + 22;
-//  data.size = audio_data_len - 22;
-//  audio_play(&data);
-//
-//  while(1);
   audio_record();
 
+  AUDIO_DATA data;
   while(audio_record_buffer_get(&data) != STATUS_SUCCESS)
   {
 	  HAL_Delay(500);

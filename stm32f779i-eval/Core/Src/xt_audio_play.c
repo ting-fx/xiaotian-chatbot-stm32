@@ -2,16 +2,11 @@
 
 /* ========================= 播放缓冲区配置 ========================= */
 
-/* DMA 单次传输的 PCM buffer 大小（单位：uint16_t 样本数）
- * 实际 DMA 使用的是双缓冲结构，因此总大小为 2 * PCM_BUFFER_SIZE
- */
+/* DMA使用的音频数据缓冲区大小 */
 #define PCM_BUFFER_SIZE     1024
 
-/* DMA 使用的 PCM 双缓冲区
- *   - 前半部分：HalfTransfer 回调期间正在播放
- *   - 后半部分：TransferComplete 回调期间正在播放
- */
-static uint16_t pcm_buffer[PCM_BUFFER_SIZE * 2]; // 双缓冲（并非声道）
+/* DMA 使用的音频数据缓冲区 */
+static uint16_t pcm_buffer[PCM_BUFFER_SIZE * 2];
 
 /* 指向待播放音频数据的指针 */
 static uint16_t *play_data = NULL;
@@ -20,14 +15,14 @@ static uint16_t *play_data = NULL;
 static uint32_t play_data_size = 0;
 
 /* 当前已经播放到的样本偏移量（单位：uint16_t） */
-static uint32_t play_size = 0;
+static uint32_t play_offset = 0;
 
 /* ========================= DMA 回调函数 ========================= */
 
 /**
  * @brief DMA 半传输完成回调
  *
- * 当 DMA 正在播放 pcm_buffer 的后半部分时触发，
+ * 当播放完 pcm_buffer 的前半部分时触发，
  * 此时前半部分已经播放完成，可以安全地重新填充：
  *   pcm_buffer[0 ... PCM_BUFFER_SIZE-1]
  */
@@ -35,24 +30,22 @@ void BSP_AUDIO_OUT_HalfTransfer_CallBack(void)
 {
     /* 将下一段音频数据拷贝到 pcm_buffer 前半部分 */
     memcpy(pcm_buffer,
-           play_data + play_size,
+           play_data + play_offset,
            sizeof(uint16_t) * PCM_BUFFER_SIZE);
 
     /* 更新播放位置 */
-    play_size += PCM_BUFFER_SIZE;
+    play_offset += PCM_BUFFER_SIZE;
 
-    /* 如果即将越过音频数据末尾，则回到起始位置（循环播放） */
-    if(play_size + PCM_BUFFER_SIZE > play_data_size)
+    if(play_offset > play_data_size)
     {
-        play_size = 0;
-        // BSP_AUDIO_OUT_Stop(CODEC_PDWN_SW); // 可选：停止播放
+        BSP_AUDIO_OUT_Stop(CODEC_PDWN_SW); // 停止播放
     }
 }
 
 /**
  * @brief DMA 全传输完成回调
  *
- * 当 DMA 正在播放 pcm_buffer 的前半部分时触发，
+ * 当播放完 pcm_buffer 的后半部分时触发，
  * 此时后半部分已经播放完成，可以安全地重新填充：
  *   pcm_buffer[PCM_BUFFER_SIZE ... 2*PCM_BUFFER_SIZE-1]
  */
@@ -60,17 +53,15 @@ void BSP_AUDIO_OUT_TransferComplete_CallBack(void)
 {
     /* 将下一段音频数据拷贝到 pcm_buffer 后半部分 */
     memcpy(pcm_buffer + PCM_BUFFER_SIZE,
-           play_data + play_size,
+           play_data + play_offset,
            sizeof(uint16_t) * PCM_BUFFER_SIZE);
 
     /* 更新播放位置 */
-    play_size += PCM_BUFFER_SIZE;
+    play_offset += PCM_BUFFER_SIZE;
 
-    /* 如果即将越过音频数据末尾，则回到起始位置（循环播放） */
-    if(play_size + PCM_BUFFER_SIZE > play_data_size)
+    if(play_offset > play_data_size)
     {
-        // BSP_AUDIO_OUT_Stop(CODEC_PDWN_SW); // 可选：停止播放
-        play_size = 0;
+        BSP_AUDIO_OUT_Stop(CODEC_PDWN_SW); // 停止播放
     }
 }
 
@@ -90,7 +81,7 @@ uint8_t audio_play(AUDIO_DATA *audio_data)
     /* 保存播放数据指针和长度 */
     play_data      = audio_data->data_ptr;
     play_data_size = audio_data->size;
-    play_size      = 0;
+    play_offset      = 0;
 
     /* 初始化音频输出设备（SAI + Codec） */
     status = BSP_AUDIO_OUT_Init(OUTPUT_DEVICE_AUTO,
@@ -108,7 +99,7 @@ uint8_t audio_play(AUDIO_DATA *audio_data)
            play_data,
            sizeof(uint16_t) * PCM_BUFFER_SIZE * 2);
 
-    play_size += PCM_BUFFER_SIZE * 2;
+    play_offset += PCM_BUFFER_SIZE * 2;
 
     /* 配置 Codec 使用的音频帧 Slot（左右声道） */
     BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);
