@@ -1,21 +1,22 @@
 #include "main.h"
 
 #define PCM_BUFFER_SIZE         1024
-#define RECORD_BUFFER_SIZE      102400
+#define RECORD_BUFFER_SIZE      409600
 #define SCRATCH_BUFF_SIZE       512
 
 #define RECORD_STATE_IDLE       0
 #define RECORD_STATE_RECORDING  1
 #define RECORD_STATE_COMPLETED  2
 
-static uint16_t pcm_buffer[PCM_BUFFER_SIZE * 2]; // 双声道
+static uint16_t pcm_buffer[PCM_BUFFER_SIZE * 2];
 static __attribute__((section(".SD_RAM"))) uint16_t record_buffer[RECORD_BUFFER_SIZE];
 static int32_t Scratch[SCRATCH_BUFF_SIZE];
 static uint32_t record_buffer_size = 0;
 static uint8_t record_state = RECORD_STATE_IDLE;
 
-void BSP_AUDIO_IN_TransferComplete_CallBack(void) {
-	memcpy(record_buffer + record_buffer_size, pcm_buffer + PCM_BUFFER_SIZE, PCM_BUFFER_SIZE * sizeof(uint16_t));
+// 录音 buffer 半满回调
+void BSP_AUDIO_IN_HalfTransfer_CallBack(void) {
+	memcpy(record_buffer + record_buffer_size, pcm_buffer, PCM_BUFFER_SIZE * sizeof(uint16_t));
 
 	record_buffer_size += PCM_BUFFER_SIZE;
 
@@ -26,8 +27,9 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(void) {
 	}
 }
 
-void BSP_AUDIO_IN_HalfTransfer_CallBack(void) {
-	memcpy(record_buffer + record_buffer_size, pcm_buffer, PCM_BUFFER_SIZE * sizeof(uint16_t));
+// 录音 buffer 完整回调
+void BSP_AUDIO_IN_TransferComplete_CallBack(void) {
+	memcpy(record_buffer + record_buffer_size, pcm_buffer + PCM_BUFFER_SIZE, PCM_BUFFER_SIZE * sizeof(uint16_t));
 
 	record_buffer_size += PCM_BUFFER_SIZE;
 

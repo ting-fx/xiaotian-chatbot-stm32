@@ -7,8 +7,8 @@ static uint16_t *play_data = NULL;
 static uint32_t play_data_size = 0; // 样本数
 static uint32_t play_size = 0;
 
-// 填充 DMA buffer 的辅助函数
-// Half Transfer 回调
+
+// 播放 buffer 半满回调
 void BSP_AUDIO_OUT_HalfTransfer_CallBack(void)
 {
     memcpy(pcm_buffer, play_data + play_size, sizeof(uint16_t) * PCM_BUFFER_SIZE);
@@ -21,7 +21,7 @@ void BSP_AUDIO_OUT_HalfTransfer_CallBack(void)
     }
 }
 
-// Transfer Complete 回调
+// 播放 buffer 完整回调
 void BSP_AUDIO_OUT_TransferComplete_CallBack(void)
 {
     memcpy(pcm_buffer + PCM_BUFFER_SIZE, play_data + play_size, sizeof(uint16_t) * PCM_BUFFER_SIZE);
@@ -49,9 +49,9 @@ uint8_t audio_play(AUDIO_DATA *audio_data)
         return STATUS_AUDIO_INIT_FAILURE;
     }
 
-    // 初始化前半缓冲
-    memcpy(pcm_buffer, play_data, sizeof(uint16_t) * PCM_BUFFER_SIZE);
-    play_size += PCM_BUFFER_SIZE;
+    // 初始化整个pcm缓冲区
+    memcpy(pcm_buffer, play_data, sizeof(uint16_t) * PCM_BUFFER_SIZE * 2);
+    play_size += PCM_BUFFER_SIZE * 2;
 
     // 配置两个slot
     BSP_AUDIO_OUT_SetAudioFrameSlot(CODEC_AUDIOFRAME_SLOT_02);
