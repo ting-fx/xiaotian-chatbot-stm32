@@ -26,7 +26,11 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
+/* SAI handler declared in "stm32f769i_eval_audio.c" file */
+extern SAI_HandleTypeDef haudio_out_sai;
 
+extern DFSDM_Filter_HandleTypeDef       haudio_in_dfsdm_leftfilter;
+extern DFSDM_Filter_HandleTypeDef       haudio_in_dfsdm_rightfilter;
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -199,5 +203,35 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /* USER CODE BEGIN 1 */
+
+/**
+  * @brief This function handles DMA2 Stream 4 interrupt request.
+  * @param None
+  * @retval None
+  */
+void AUDIO_SAIx_DMAx_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(haudio_out_sai.hdmatx);
+}
+
+/**
+  * @brief This function handles DMA2 Stream 0 interrupt request.
+  * @param None
+  * @retval None
+  */
+void AUDIO_DFSDM_DMAx_LEFT_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(haudio_in_dfsdm_leftfilter.hdmaReg);
+}
+
+/**
+  * @brief This function handles DMA2 Stream 0 interrupt request.
+  * @param None
+  * @retval None
+  */
+void AUDIO_DFSDM_DMAx_RIGHT_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(haudio_in_dfsdm_rightfilter.hdmaReg);
+}
 
 /* USER CODE END 1 */

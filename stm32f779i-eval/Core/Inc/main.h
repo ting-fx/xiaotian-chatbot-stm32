@@ -31,6 +31,8 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <string.h>
+#include "xt_audio.h"
 
 /* USER CODE END Includes */
 
@@ -46,6 +48,16 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+
+/* Define status. */
+#define STATUS_SUCCESS              0
+#define STATUS_FAILURE              1
+
+/* Audio status. */
+#define STATUS_AUDIO_INIT_FAILURE   0x0010
+#define STATUS_AUDIO_PLAY_FAILURE   0x0020
+#define STATUS_AUDIO_RECORD_FAILURE 0x0030
+#define STATUS_AUDIO_NULL_PTR       0x0040
 
 /* USER CODE END EM */
 
