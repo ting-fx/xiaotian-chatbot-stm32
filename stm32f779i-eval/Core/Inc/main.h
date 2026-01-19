@@ -33,6 +33,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include <string.h>
 #include "xt_audio.h"
+#include "stm32f769i_eval_sdram.h"
 
 /* USER CODE END Includes */
 
