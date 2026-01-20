@@ -1,5 +1,7 @@
 # ThreadX 线程切换机制
 
+![alt text](<imgs/4 ThreadX线程切换-1.png>)
+
 ## PendSV
 
 PendSV 是 Cortex-M 内核提供的一种 可挂起（Pendable）、优先级最低的异常，专门用于在合适且安全的时机执行操作系统相关的工作，最典型的用途就是 线程上下文切换（Context Switch）。
