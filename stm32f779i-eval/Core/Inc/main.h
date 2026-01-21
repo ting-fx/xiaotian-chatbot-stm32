@@ -35,6 +35,7 @@ extern "C" {
 #include "xt_audio.h"
 #include "stm32f769i_eval_sdram.h"
 #include "tx_api.h"
+#include "xt_gui.h"
 
 /* USER CODE END Includes */
 
