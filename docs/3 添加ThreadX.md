@@ -24,7 +24,7 @@
 
 - 勾选RTOS ThreadX
 
-![alt text](<imgs/3 添加ThreadX-5-勾选rtos.png>)
+![alt text](<imgs/3 添加ThreadX-4-勾选rtos.png>)
 
 ### 3. 修改STM32 HAL时基源
 
@@ -34,7 +34,7 @@
 
 - 将SysTick修改为其他硬件定时器，例如：TIM6
 
-![alt text](<imgs/3 添加ThreadX-4-SYS时基修改.png>)
+![alt text](<imgs/3 添加ThreadX-5-SYS时基修改.png>)
 
 说明：
 - SysTick → ThreadX 内核调度
