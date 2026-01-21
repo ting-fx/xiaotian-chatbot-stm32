@@ -77,6 +77,9 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   BSP_SDRAM_Init();
+
+  SCB_EnableICache();
+  SCB_InvalidateDCache();
   /* USER CODE END Init */
 
   /* Configure the system clock */
