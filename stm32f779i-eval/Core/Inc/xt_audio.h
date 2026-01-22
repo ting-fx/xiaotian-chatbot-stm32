@@ -1,5 +1,6 @@
 
 #ifndef __XT_AUDIO_H
+#define __XT_AUDIO_H
 
 #include "stm32f769i_eval_audio.h"
 

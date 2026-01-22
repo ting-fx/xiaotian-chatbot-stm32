@@ -1,7 +1,7 @@
 
-## 添加ThreadX（X-CUBE-AZRTOS-F7)
+## 1. 添加ThreadX（X-CUBE-AZRTOS-F7)
 
-### 1. 下载 Azure RTOS 软件包
+### 1.1. 下载 Azure RTOS 软件包
 - 打开 CubeMX，依次选择：Help → Embedded Software Packages Manager
 
 ![alt text](<imgs/3 添加ThreadX-1-下载软件包.png>)
@@ -11,7 +11,7 @@
 - 找到 X-CUBE-AZRTOS-F7
 - 下载软件包
 
-### 2. 启用ThreadX组件
+### 1.2. 启用ThreadX组件
 
 - 在Middleware and Software Packs目录下找到刚刚下载的 X-CUBE-AZRTOS-F7，打开组件选择页面
 
@@ -26,7 +26,7 @@
 
 ![alt text](<imgs/3 添加ThreadX-4-勾选rtos.png>)
 
-### 3. 修改STM32 HAL时基源
+### 1.3. 修改STM32 HAL时基源
 
 由于 ThreadX 使用 SysTick 作为内核时基（RTOS Tick），需要避免与 HAL 冲突，因此必须修改 STM32 的 HAL 时间基准。
 
@@ -40,11 +40,11 @@
 - SysTick → ThreadX 内核调度
 - TIMx → HAL_Delay / HAL 超时机制
 
-## 生成代码分析
+## 2. 生成代码分析
 
 完成代码生成后，在 app_threadx.c 中可以看到 CubeMX 自动生成的 ThreadX 启动框架。
 
-### 1. ThreadX启动入口函数
+### 2.1. ThreadX启动入口函数
 ```c
 void MX_ThreadX_Init(void)
 {
@@ -66,7 +66,7 @@ tx_kernel_enter();
 ```
 该函数用于完成 ThreadX 内核层的初始化，并启动 RTOS。
 
-### 2. 用户初始化函数App_ThreadX_Init
+### 2.2. 用户初始化函数App_ThreadX_Init
 
 ```c
 UINT App_ThreadX_Init(VOID *memory_ptr)
@@ -129,7 +129,7 @@ VOID tx_application_define(VOID *first_unused_memory)
 }
 ```
 
-## ThreadX启动流程说明
+### 2.3 ThreadX启动流程说明
 
 在 `main.c` 中，程序会调用 `MX_ThreadX_Init()`，其内部调用 `tx_kernel_enter()`。
 

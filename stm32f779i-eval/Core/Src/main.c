@@ -48,6 +48,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void PeriphCommonClock_Config(void);
 static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -76,10 +77,16 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   BSP_SDRAM_Init();
+
+  SCB_EnableICache();
+  SCB_InvalidateDCache();
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
+
+  /* Configure the peripherals common clocks */
+  PeriphCommonClock_Config();
 
   /* USER CODE BEGIN SysInit */
 
@@ -151,6 +158,30 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief Peripherals Common Clock Configuration
+  * @retval None
+  */
+void PeriphCommonClock_Config(void)
+{
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+
+  /** Initializes the peripherals clock
+  */
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_SAI2;
+  PeriphClkInitStruct.PLLSAI.PLLSAIN = 192;
+  PeriphClkInitStruct.PLLSAI.PLLSAIR = 2;
+  PeriphClkInitStruct.PLLSAI.PLLSAIQ = 3;
+  PeriphClkInitStruct.PLLSAI.PLLSAIP = RCC_PLLSAIP_DIV2;
+  PeriphClkInitStruct.PLLSAIDivQ = 1;
+  PeriphClkInitStruct.PLLSAIDivR = RCC_PLLSAIDIVR_2;
+  PeriphClkInitStruct.Sai2ClockSelection = RCC_SAI2CLKSOURCE_PLLSAI;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
@@ -279,16 +310,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(EXPANDER_INT_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LCD_DE_Pin LCD_B7_Pin LCD_B6_Pin LCD_B5_Pin
-                           LCD_B4_Pin */
-  GPIO_InitStruct.Pin = LCD_DE_Pin|LCD_B7_Pin|LCD_B6_Pin|LCD_B5_Pin
-                          |LCD_B4_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
-  HAL_GPIO_Init(GPIOK, &GPIO_InitStruct);
-
   /*Configure GPIO pin : SPDIF_RX1_Pin */
   GPIO_InitStruct.Pin = SPDIF_RX1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -304,14 +325,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF11_SDMMC2;
   HAL_GPIO_Init(SD2_D1_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LCD_B2_Pin LCD_B3_Pin LCD_R5_Pin LCD_R6_Pin */
-  GPIO_InitStruct.Pin = LCD_B2_Pin|LCD_B3_Pin|LCD_R5_Pin|LCD_R6_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
-  HAL_GPIO_Init(GPIOJ, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PAR_D5_Pin */
   GPIO_InitStruct.Pin = PAR_D5_Pin;
@@ -334,14 +347,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF12_SDMMC1;
   HAL_GPIO_Init(SD1_CMD_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LCD_HSYNC_Pin LCD_VSYNC_Pin LCD_CLK_Pin */
-  GPIO_InitStruct.Pin = LCD_HSYNC_Pin|LCD_VSYNC_Pin|LCD_CLK_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
-  HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
 
   /*Configure GPIO pin : ULPI_DIR_Pin */
   GPIO_InitStruct.Pin = ULPI_DIR_Pin;
