@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.4.0.0                                               */
-/*  Date (dd.mm.yyyy): 21. 1.2026   Time (hh:mm): 11:11                        */
+/*  Date (dd.mm.yyyy): 22. 1.2026   Time (hh:mm): 14:41                        */
 /*******************************************************************************/
 
 
@@ -87,6 +87,7 @@ typedef struct MAIN_SCREEN_CONTROL_BLOCK_STRUCT
 {
     GX_WINDOW_MEMBERS_DECLARE
     GX_PROMPT main_screen_prompt;
+    GX_PROMPT main_screen_status;
 } MAIN_SCREEN_CONTROL_BLOCK;
 
 

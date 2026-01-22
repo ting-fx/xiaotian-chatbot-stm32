@@ -3,13 +3,14 @@
 #include "main.h"
 #include "picovoice.h"
 #include "pv_porcupine_mcu.h"
+#include "pv_porcupine_params.h"
 
 #define MEMORY_BUFFER_SIZE (50 * 1024)
 
 static const char* ACCESS_KEY = "faD51PcWzhgb64ZjYg6bWvlUGxWk3xVshkFliz+TZNnnThNKOh2L+g==";
 uint8_t memory_buffer[MEMORY_BUFFER_SIZE] __attribute__((aligned(16)));
-extern const int32_t keyword_model_sizes;
-extern const void *keyword_models;
+const int32_t keyword_model_sizes = sizeof(PICOVOICE_KEYWORD_ARRAY);
+const void *keyword_models = PICOVOICE_KEYWORD_ARRAY;
 const float sensitivity = 0.5f;
 
 /* Define prototypes.   */

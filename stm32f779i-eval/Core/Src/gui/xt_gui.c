@@ -1,8 +1,6 @@
 /* This is a small demo of the high-performance GUIX graphics framework. */
 
 #include "xt_gui.h"
-#include "xt_gui_resources.h"
-#include "xt_gui_specifications.h"
 
 #define  CANVAS_MEMORY_SIZE      (DISPLAY_1_X_RESOLUTION * DISPLAY_1_Y_RESOLUTION)
 

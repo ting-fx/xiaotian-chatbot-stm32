@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.4.0.0                                               */
-/*  Date (dd.mm.yyyy): 21. 1.2026   Time (hh:mm): 11:11                        */
+/*  Date (dd.mm.yyyy): 22. 1.2026   Time (hh:mm): 14:41                        */
 /*******************************************************************************/
 
 
@@ -90,6 +90,38 @@ GX_PROMPT_PROPERTIES main_screen_prompt_properties =
     GX_COLOR_ID_SELECTED_TEXT,               /* selected text color            */
     GX_COLOR_ID_DISABLED_TEXT                /* disabled text color            */
 };
+GX_PROMPT_PROPERTIES main_screen_status_properties =
+{
+    0,                                       /* string id                      */
+    GX_FONT_ID_CJK,                          /* font id                        */
+    GX_COLOR_ID_TEXT,                        /* normal text color              */
+    GX_COLOR_ID_SELECTED_TEXT,               /* selected text color            */
+    GX_COLOR_ID_DISABLED_TEXT                /* disabled text color            */
+};
+
+GX_CONST GX_STUDIO_WIDGET main_screen_status_define =
+{
+    "status",
+    GX_TYPE_PROMPT,                          /* widget type                    */
+    GX_ID_NONE,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_TRANSPARENT|GX_STYLE_ENABLED|GX_STYLE_TEXT_CENTER,   /* style flags */
+    0,                                       /* status flags                   */
+    sizeof(GX_PROMPT),                       /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_prompt_create,                 /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {275, 196, 499, 261},                    /* widget size                    */
+    GX_NULL,                                 /* no next widget                 */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(MAIN_SCREEN_CONTROL_BLOCK, main_screen_status), /* control block  */
+    (void *) &main_screen_status_properties  /* extended properties            */
+};
 
 GX_CONST GX_STUDIO_WIDGET main_screen_prompt_define =
 {
@@ -109,7 +141,7 @@ GX_CONST GX_STUDIO_WIDGET main_screen_prompt_define =
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
     {282, 30, 506, 95},                      /* widget size                    */
-    GX_NULL,                                 /* no next widget                 */
+    &main_screen_status_define,              /* next widget definition         */
     GX_NULL,                                 /* no child widgets               */ 
     offsetof(MAIN_SCREEN_CONTROL_BLOCK, main_screen_prompt), /* control block  */
     (void *) &main_screen_prompt_properties  /* extended properties            */

@@ -6,7 +6,7 @@
 /*  Studio User Guide, or visit our web site at azure.com/rtos                 */
 /*                                                                             */
 /*  GUIX Studio Revision 6.4.0.0                                               */
-/*  Date (dd.mm.yyyy): 21. 1.2026   Time (hh:mm): 11:11                        */
+/*  Date (dd.mm.yyyy): 22. 1.2026   Time (hh:mm): 14:41                        */
 /*******************************************************************************/
 
 
@@ -48,7 +48,7 @@
 
 /* String Ids                                                                  */
 
-#define GX_STRING_ID_STRING_1 1
+#define GX_STRING_ID_LISTENING 1
 #define GX_STRING_ID_STRING_2 2
 #define DISPLAY_1_STRING_TABLE_SIZE 3
 
