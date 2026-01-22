@@ -63,6 +63,7 @@ uint8_t wakeword_detection(){
     }
 
     pv_porcupine_delete(handle);
+    audio_stop();
 
     return STATUS_SUCCESS;
 }

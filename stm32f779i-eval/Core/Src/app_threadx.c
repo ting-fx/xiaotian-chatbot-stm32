@@ -112,6 +112,8 @@ void chat_thread_setup()
 
 VOID chat_thread_entry(ULONG thread_input)
 {
+	tx_thread_sleep(1000);
+
 	while(1)
 	{
 		if(wakeword_detection())

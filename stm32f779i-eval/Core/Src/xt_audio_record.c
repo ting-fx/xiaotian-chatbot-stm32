@@ -66,7 +66,7 @@ void BSP_AUDIO_IN_HalfTransfer_CallBack(void)
 
 		if(record_info.buffer_index >= WAKEWORD_FRAME_SIZE)
 		{
-			if(record_info.write_index < WAKEWORD_FRAME_COUNT)
+			if(record_info.write_index < WAKEWORD_FRAME_COUNT - 1)
 			{
 				record_info.write_index++;
 			}
@@ -101,7 +101,7 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(void)
 
 		if(record_info.buffer_index >= WAKEWORD_FRAME_SIZE)
 		{
-			if(record_info.write_index < WAKEWORD_FRAME_COUNT)
+			if(record_info.write_index < WAKEWORD_FRAME_COUNT - 1)
 			{
 				record_info.write_index++;
 			}
@@ -186,7 +186,7 @@ uint8_t audio_record_data_get(AUDIO_DATA *audio_data)
     	audio_data->data_ptr = record_info.wakeword_frame[record_info.read_index];
     	audio_data->size = WAKEWORD_FRAME_SIZE;
 
-    	if(record_info.read_index < WAKEWORD_FRAME_COUNT)
+    	if(record_info.read_index < WAKEWORD_FRAME_COUNT - 1)
     	{
     		record_info.read_index ++;
     	}
@@ -194,6 +194,8 @@ uint8_t audio_record_data_get(AUDIO_DATA *audio_data)
     	{
     		record_info.read_index = 0;
     	}
+
+    	return STATUS_SUCCESS;
     }
 
     return STATUS_FAILURE;
