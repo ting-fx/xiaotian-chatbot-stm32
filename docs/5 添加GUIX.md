@@ -137,7 +137,6 @@ VOID gui_thread_entry(ULONG thread_input)
   /* Enable D-Cache */
   SCB_EnableDCache();
 ```
-- 建议在 main() 早期执行。
 
 ## 8. 启动 GUIX
 
@@ -145,7 +144,6 @@ VOID gui_thread_entry(ULONG thread_input)
 ```c
 gui_setup();
 ```
-至此，GUIX 将随 ThreadX 调度一起运行。
 
 
 
