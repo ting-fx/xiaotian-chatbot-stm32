@@ -13,10 +13,23 @@
 /* DFSDM 使用的 Scratch buffer，用于内部滤波或中间运算 */
 #define SCRATCH_BUFF_SIZE       512
 
-/* 录音状态机定义 */
-#define RECORD_STATE_IDLE       0   // 空闲
-#define RECORD_STATE_RECORDING  1   // 正在录音
-#define RECORD_STATE_COMPLETED  2   // 录音完成
+#define WAKEWORD_FRAME_SIZE     512
+#define WAKEWORD_FRAME_COUNT    2
+
+struct record_info_struct{
+	/* 当前已录入的样本数（单位：uint16_t） */
+	uint32_t buffer_size;
+
+	union{
+		uint16_t *wakeword_frame[WAKEWORD_FRAME_COUNT];
+	};
+
+	uint32_t buffer_index;
+	int8_t write_index;
+	int8_t read_index;
+
+	uint8_t mode;
+}record_info;
 
 /* ========================= 全局静态变量 ========================= */
 
@@ -32,12 +45,6 @@ uint16_t record_buffer[RECORD_BUFFER_SIZE];
 /* DFSDM 使用的 Scratch buffer */
 static int32_t Scratch[SCRATCH_BUFF_SIZE];
 
-/* 当前已录入的样本数（单位：uint16_t） */
-static uint32_t record_buffer_size = 0;
-
-/* 当前录音状态 */
-static uint8_t record_state = RECORD_STATE_IDLE;
-
 /* ========================= DMA 回调函数 ========================= */
 
 /**
@@ -50,20 +57,29 @@ static uint8_t record_state = RECORD_STATE_IDLE;
  */
 void BSP_AUDIO_IN_HalfTransfer_CallBack(void)
 {
-    /* 将 DMA buffer 前半部分拷贝到录音 buffer */
-    memcpy(record_buffer + record_buffer_size,
-           pcm_buffer,
-           PCM_BUFFER_SIZE * sizeof(uint16_t));
+	if(record_info.mode == RECORD_MODE_WAKEWORD)
+	{
+		for(int i = 0; i < PCM_BUFFER_SIZE; i+=2)
+		{
+			record_info.wakeword_frame[record_info.write_index][record_info.buffer_index++] = pcm_buffer[i];
+		}
 
-    /* 更新已录入样本数 */
-    record_buffer_size += PCM_BUFFER_SIZE;
+		if(record_info.buffer_index >= WAKEWORD_FRAME_SIZE)
+		{
+			if(record_info.write_index < WAKEWORD_FRAME_COUNT)
+			{
+				record_info.write_index++;
+			}
+			else
+			{
+				record_info.write_index = 0;
+			}
 
-    /* 如果录音 buffer 已满，停止录音 */
-    if(record_buffer_size >= RECORD_BUFFER_SIZE)
-    {
-        BSP_AUDIO_IN_Stop();
-        record_state = RECORD_STATE_COMPLETED;
-    }
+			record_info.buffer_index = 0;
+
+			tx_event_flags_set(&xt_event_group, XT_EVENT_AUDIO_WAKEWORD_READY, 0);
+		}
+	}
 }
 
 /**
@@ -76,20 +92,29 @@ void BSP_AUDIO_IN_HalfTransfer_CallBack(void)
  */
 void BSP_AUDIO_IN_TransferComplete_CallBack(void)
 {
-    /* 将 DMA buffer 后半部分拷贝到录音 buffer */
-    memcpy(record_buffer + record_buffer_size,
-           pcm_buffer + PCM_BUFFER_SIZE,
-           PCM_BUFFER_SIZE * sizeof(uint16_t));
+	if(record_info.mode == RECORD_MODE_WAKEWORD)
+	{
+		for(int i = 0; i < PCM_BUFFER_SIZE; i+=2)
+		{
+			record_info.wakeword_frame[record_info.write_index][record_info.buffer_index++] = pcm_buffer[PCM_BUFFER_SIZE + i];
+		}
 
-    /* 更新已录入样本数 */
-    record_buffer_size += PCM_BUFFER_SIZE;
+		if(record_info.buffer_index >= WAKEWORD_FRAME_SIZE)
+		{
+			if(record_info.write_index < WAKEWORD_FRAME_COUNT)
+			{
+				record_info.write_index++;
+			}
+			else
+			{
+				record_info.write_index = 0;
+			}
 
-    /* 如果录音 buffer 已满，停止录音 */
-    if(record_buffer_size >= RECORD_BUFFER_SIZE)
-    {
-        BSP_AUDIO_IN_Stop();
-        record_state = RECORD_STATE_COMPLETED;
-    }
+			record_info.buffer_index = 0;
+
+			tx_event_flags_set(&xt_event_group, XT_EVENT_AUDIO_WAKEWORD_READY, 0);
+		}
+	}
 }
 
 /* ========================= 录音控制接口 ========================= */
@@ -99,15 +124,22 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(void)
  *
  * 初始化音频输入并启动录音到 pcm_buffer
  */
-uint8_t audio_record(void)
+uint8_t audio_record(uint8_t mode)
 {
     uint8_t status;
 
-    /* 清空录音计数 */
-    record_buffer_size = 0;
+    record_info.buffer_size = 0;
+    record_info.mode = mode;
 
-    /* 设置状态为录音中 */
-    record_state = RECORD_STATE_RECORDING;
+    if(mode == RECORD_MODE_WAKEWORD)
+    {
+		record_info.wakeword_frame[0] = record_buffer;
+		record_info.wakeword_frame[1] = record_buffer + WAKEWORD_FRAME_SIZE;
+    }
+
+    record_info.buffer_index = 0;
+    record_info.write_index = 0;
+    record_info.read_index = 0;
 
     /* 初始化音频输入参数：采样率、位宽、通道数 */
     status = BSP_AUDIO_IN_Init(DEFAULT_AUDIO_IN_FREQ,
@@ -141,7 +173,7 @@ uint8_t audio_record(void)
  *
  * 仅当录音完成后，才返回数据指针和大小
  */
-uint8_t audio_record_buffer_get(AUDIO_DATA *audio_data)
+uint8_t audio_record_data_get(AUDIO_DATA *audio_data)
 {
     if(!audio_data)
     {
@@ -149,12 +181,25 @@ uint8_t audio_record_buffer_get(AUDIO_DATA *audio_data)
     }
 
     /* 只有在录音完成状态下才允许读取数据 */
-    if(record_state == RECORD_STATE_COMPLETED)
+    if(record_info.mode == RECORD_MODE_WAKEWORD)
     {
-        audio_data->data_ptr = record_buffer;
-        audio_data->size     = record_buffer_size;
-        return STATUS_SUCCESS;
+    	audio_data->data_ptr = record_info.wakeword_frame[record_info.read_index];
+    	audio_data->size = WAKEWORD_FRAME_SIZE;
+
+    	if(record_info.read_index < WAKEWORD_FRAME_COUNT)
+    	{
+    		record_info.read_index ++;
+    	}
+    	else
+    	{
+    		record_info.read_index = 0;
+    	}
     }
 
     return STATUS_FAILURE;
+}
+
+void audio_stop()
+{
+	BSP_AUDIO_IN_Stop();
 }

@@ -57,6 +57,11 @@ void MX_ThreadX_Init(void);
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+extern TX_EVENT_FLAGS_GROUP xt_event_group;
+
+#define XT_EVENT_AUDIO_MASK           0x11
+#define XT_EVENT_AUDIO_WAKEWORD_READY 0x10
+#define XT_EVENT_ADUIO_VOID_READY     0x01
 
 /* USER CODE END PD */
 
