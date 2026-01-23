@@ -6,7 +6,7 @@
 /*  Studio User Guide, or visit our web site at azure.com/rtos                 */
 /*                                                                             */
 /*  GUIX Studio Revision 6.4.0.0                                               */
-/*  Date (dd.mm.yyyy): 22. 1.2026   Time (hh:mm): 14:41                        */
+/*  Date (dd.mm.yyyy): 23. 1.2026   Time (hh:mm): 09:44                        */
 /*******************************************************************************/
 
 
@@ -44,7 +44,8 @@
 
 /* Pixelmap ID definitions                                                     */
 
-#define DISPLAY_1_PIXELMAP_TABLE_SIZE 5
+#define GX_PIXELMAP_ID_RECORDING 5
+#define DISPLAY_1_PIXELMAP_TABLE_SIZE 6
 
 /* String Ids                                                                  */
 

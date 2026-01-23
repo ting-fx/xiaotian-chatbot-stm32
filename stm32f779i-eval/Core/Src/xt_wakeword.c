@@ -41,6 +41,8 @@ uint8_t wakeword_detection(){
 
     ULONG actual_events;
 
+    tx_event_flags_set(&xt_event_group, XT_EVENT_GUI_RECORDING, TX_OR);
+
     while (1)
     {
     	tx_event_flags_get(&xt_event_group, XT_EVENT_AUDIO_MASK, TX_OR_CLEAR , &actual_events, TX_WAIT_FOREVER);
@@ -62,6 +64,8 @@ uint8_t wakeword_detection(){
 			}
     	}
     }
+
+    tx_event_flags_set(&xt_event_group, XT_EVENT_GUI_DETECTED, TX_OR);
 
     pv_porcupine_delete(handle);
     audio_stop();

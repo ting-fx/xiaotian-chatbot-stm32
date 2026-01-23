@@ -106,8 +106,8 @@ void chat_thread_setup()
     /* 创建Touch线程  */
     tx_thread_create(&chat_thread, "Chat Thread", chat_thread_entry, 0,
                      chat_thread_stack, sizeof(chat_thread_stack),
-                     GX_SYSTEM_THREAD_PRIORITY + 1,
-                     GX_SYSTEM_THREAD_PRIORITY + 1, TX_NO_TIME_SLICE, TX_AUTO_START);
+					 XT_CHAT_THREAD_PRIORITY + 1,
+					 XT_CHAT_THREAD_PRIORITY + 1, TX_NO_TIME_SLICE, TX_AUTO_START);
 }
 
 VOID chat_thread_entry(ULONG thread_input)
@@ -118,8 +118,6 @@ VOID chat_thread_entry(ULONG thread_input)
 	{
 		if(wakeword_detection() == STATUS_SUCCESS)
 		{
-			gx_prompt_text_id_set(&main_screen.main_screen_status, GX_STRING_ID_LISTENING);
-			gx_system_canvas_refresh();
 			tx_thread_sleep(1000);
 		}
 	}
