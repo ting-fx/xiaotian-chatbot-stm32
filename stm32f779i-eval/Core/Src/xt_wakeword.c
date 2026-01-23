@@ -9,8 +9,8 @@
 
 static const char* ACCESS_KEY = "faD51PcWzhgb64ZjYg6bWvlUGxWk3xVshkFliz+TZNnnThNKOh2L+g==";
 uint8_t memory_buffer[MEMORY_BUFFER_SIZE] __attribute__((aligned(16)));
-const int32_t keyword_model_sizes = sizeof(PICOVOICE_KEYWORD_ARRAY);
-const void *keyword_models = PICOVOICE_KEYWORD_ARRAY;
+const int32_t keyword_model_sizes = sizeof(HELLO_COMPUTER_KEYWORD_ARRAY);
+const void *keyword_models = HELLO_COMPUTER_KEYWORD_ARRAY;
 const float sensitivity = 0.5f;
 
 /* Define prototypes.   */
