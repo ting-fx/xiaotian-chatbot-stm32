@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.4.0.0                                               */
-/*  Date (dd.mm.yyyy): 21. 1.2026   Time (hh:mm): 11:11                        */
+/*  Date (dd.mm.yyyy): 23. 1.2026   Time (hh:mm): 09:44                        */
 /*******************************************************************************/
 
 
@@ -68,6 +68,12 @@ typedef struct
 
 typedef struct
 {
+    GX_RESOURCE_ID normal_pixelmap_id;
+    GX_RESOURCE_ID selected_pixelmap_id;
+} GX_ICON_PROPERTIES;
+
+typedef struct
+{
     GX_RESOURCE_ID string_id;
     GX_RESOURCE_ID font_id;
     GX_RESOURCE_ID normal_text_color_id;
@@ -86,7 +92,9 @@ typedef struct
 typedef struct MAIN_SCREEN_CONTROL_BLOCK_STRUCT
 {
     GX_WINDOW_MEMBERS_DECLARE
-    GX_PROMPT main_screen_prompt;
+    GX_PROMPT main_screen_title;
+    GX_PROMPT main_screen_detected;
+    GX_ICON main_screen_recording;
 } MAIN_SCREEN_CONTROL_BLOCK;
 
 
@@ -124,6 +132,7 @@ typedef struct GX_STUDIO_DISPLAY_INFO_STRUCT
 
 /* Declare Studio-generated functions for creating top-level widgets           */
 
+UINT gx_studio_icon_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent);
 UINT gx_studio_prompt_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent);
 UINT gx_studio_window_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent);
 GX_WIDGET *gx_studio_widget_create(GX_BYTE *storage, GX_CONST GX_STUDIO_WIDGET *definition, GX_WIDGET *parent);

@@ -1,6 +1,9 @@
 /* This is a small demo of the high-performance GUIX graphics framework. */
 
+#include "main.h"
 #include "xt_gui.h"
+#include "gx_api.h"
+#include "gx_display_driver_stm32f779i-eval_565rgb.h"
 #include "xt_gui_resources.h"
 #include "xt_gui_specifications.h"
 
@@ -22,14 +25,14 @@ void gui_setup()
     /* 创建Touch线程  */
     tx_thread_create(&touch_thread, "GUIX Touch Thread", touch_thread_entry, 0,
                      touch_thread_stack, sizeof(touch_thread_stack),
-                     GX_SYSTEM_THREAD_PRIORITY - 1,
-                     GX_SYSTEM_THREAD_PRIORITY - 1, TX_NO_TIME_SLICE, TX_AUTO_START);
+					 XT_CHAT_THREAD_PRIORITY - 1,
+					 XT_CHAT_THREAD_PRIORITY - 1, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     /* 创建GUI线程  */
     tx_thread_create(&gui_thread, "GUI Thread", gui_thread_entry, 0,
                      gui_thread_stack, sizeof(gui_thread_stack),
-                     GX_SYSTEM_THREAD_PRIORITY,
-                     GX_SYSTEM_THREAD_PRIORITY, TX_NO_TIME_SLICE, TX_AUTO_START);
+					 XT_CHAT_THREAD_PRIORITY,
+					 XT_CHAT_THREAD_PRIORITY, TX_NO_TIME_SLICE, TX_AUTO_START);
 }
 
 /******************************************************************************************/
@@ -50,7 +53,30 @@ VOID gui_thread_entry(ULONG thread_input)
 
     /* Show the root window to make it and main screen visible.  */
     gx_widget_show(root);
+    gx_widget_hide(&main_screen.main_screen_detected);
+    gx_widget_hide(&main_screen.main_screen_recording);
 
     /* Let GUIX run */
     gx_system_start();
+
+    ULONG actual_events;
+
+    while(1)
+    {
+    	tx_event_flags_get(&xt_event_group, XT_EVENT_GUI_MASK, TX_OR_CLEAR , &actual_events, TX_WAIT_FOREVER);
+
+    	if(actual_events & XT_EVENT_GUI_RECORDING)
+    	{
+			gx_widget_show(&main_screen.main_screen_recording);
+			gx_widget_hide(&main_screen.main_screen_detected);
+			gx_system_canvas_refresh();
+    	}
+
+    	if(actual_events & XT_EVENT_GUI_DETECTED)
+    	{
+    		gx_widget_show(&main_screen.main_screen_detected);
+    		gx_widget_hide(&main_screen.main_screen_recording);
+			gx_system_canvas_refresh();
+    	}
+    }
 }

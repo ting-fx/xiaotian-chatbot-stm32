@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.4.0.0                                               */
-/*  Date (dd.mm.yyyy): 21. 1.2026   Time (hh:mm): 11:11                        */
+/*  Date (dd.mm.yyyy): 23. 1.2026   Time (hh:mm): 09:44                        */
 /*******************************************************************************/
 
 
@@ -45,6 +45,23 @@ GX_STUDIO_DISPLAY_INFO xt_gui_display_table[1] =
 };
 
 
+UINT gx_studio_icon_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent)
+{
+    UINT status;
+    GX_ICON *icon = (GX_ICON *) control_block;
+    GX_ICON_PROPERTIES *props = (GX_ICON_PROPERTIES *) info->properties;
+    status = gx_icon_create(icon, info->widget_name, parent, props->normal_pixelmap_id, info->style, info->widget_id, info->size.gx_rectangle_left, info->size.gx_rectangle_top);
+    if (props->selected_pixelmap_id)
+    {
+        gx_icon_pixelmap_set(icon, props->normal_pixelmap_id, props->selected_pixelmap_id);
+    }
+    else
+    {
+        gx_widget_resize((GX_WIDGET *)icon, (GX_RECTANGLE *)&info->size);
+    }
+    return status;
+}
+
 UINT gx_studio_prompt_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent)
 {
     UINT status;
@@ -82,7 +99,7 @@ GX_WINDOW_PROPERTIES main_screen_properties =
 {
     0                                        /* wallpaper pixelmap id          */
 };
-GX_PROMPT_PROPERTIES main_screen_prompt_properties =
+GX_PROMPT_PROPERTIES main_screen_title_properties =
 {
     GX_STRING_ID_STRING_2,                   /* string id                      */
     GX_FONT_ID_CJK,                          /* font id                        */
@@ -90,10 +107,71 @@ GX_PROMPT_PROPERTIES main_screen_prompt_properties =
     GX_COLOR_ID_SELECTED_TEXT,               /* selected text color            */
     GX_COLOR_ID_DISABLED_TEXT                /* disabled text color            */
 };
-
-GX_CONST GX_STUDIO_WIDGET main_screen_prompt_define =
+GX_PROMPT_PROPERTIES main_screen_detected_properties =
 {
-    "prompt",
+    GX_STRING_ID_LISTENING,                  /* string id                      */
+    GX_FONT_ID_CJK,                          /* font id                        */
+    GX_COLOR_ID_TEXT,                        /* normal text color              */
+    GX_COLOR_ID_SELECTED_TEXT,               /* selected text color            */
+    GX_COLOR_ID_DISABLED_TEXT                /* disabled text color            */
+};
+GX_ICON_PROPERTIES main_screen_recording_properties =
+{
+    GX_PIXELMAP_ID_RECORDING,                /* normal pixelmap id             */
+    0                                        /* selected pixelmap id           */
+};
+
+GX_CONST GX_STUDIO_WIDGET main_screen_recording_define =
+{
+    "recording",
+    GX_TYPE_ICON,                            /* widget type                    */
+    GX_ID_NONE,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
+    0,                                       /* status flags                   */
+    sizeof(GX_ICON),                         /* control block size             */
+    GX_COLOR_ID_CANVAS,                      /* normal color id                */
+    GX_COLOR_ID_CANVAS,                      /* selected color id              */
+    GX_COLOR_ID_CANVAS,                      /* disabled color id              */
+    gx_studio_icon_create,                   /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {308, 157, 484, 333},                    /* widget size                    */
+    GX_NULL,                                 /* no next widget                 */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(MAIN_SCREEN_CONTROL_BLOCK, main_screen_recording), /* control block */
+    (void *) &main_screen_recording_properties /* extended properties          */
+};
+
+GX_CONST GX_STUDIO_WIDGET main_screen_detected_define =
+{
+    "detected",
+    GX_TYPE_PROMPT,                          /* widget type                    */
+    GX_ID_NONE,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_TRANSPARENT|GX_STYLE_ENABLED|GX_STYLE_TEXT_CENTER,   /* style flags */
+    0,                                       /* status flags                   */
+    sizeof(GX_PROMPT),                       /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_prompt_create,                 /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {285, 205, 509, 270},                    /* widget size                    */
+    &main_screen_recording_define,           /* next widget definition         */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(MAIN_SCREEN_CONTROL_BLOCK, main_screen_detected), /* control block */
+    (void *) &main_screen_detected_properties /* extended properties           */
+};
+
+GX_CONST GX_STUDIO_WIDGET main_screen_title_define =
+{
+    "title",
     GX_TYPE_PROMPT,                          /* widget type                    */
     GX_ID_NONE,                              /* widget id                      */
     #if defined(GX_WIDGET_USER_DATA)
@@ -109,10 +187,10 @@ GX_CONST GX_STUDIO_WIDGET main_screen_prompt_define =
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
     {282, 30, 506, 95},                      /* widget size                    */
-    GX_NULL,                                 /* no next widget                 */
+    &main_screen_detected_define,            /* next widget definition         */
     GX_NULL,                                 /* no child widgets               */ 
-    offsetof(MAIN_SCREEN_CONTROL_BLOCK, main_screen_prompt), /* control block  */
-    (void *) &main_screen_prompt_properties  /* extended properties            */
+    offsetof(MAIN_SCREEN_CONTROL_BLOCK, main_screen_title), /* control block   */
+    (void *) &main_screen_title_properties   /* extended properties            */
 };
 
 GX_CONST GX_STUDIO_WIDGET main_screen_define =
@@ -134,7 +212,7 @@ GX_CONST GX_STUDIO_WIDGET main_screen_define =
     GX_NULL,                                 /* event function override        */
     {0, 0, 799, 479},                        /* widget size                    */
     GX_NULL,                                 /* next widget                    */
-    &main_screen_prompt_define,              /* child widget                   */
+    &main_screen_title_define,               /* child widget                   */
     0,                                       /* control block                  */
     (void *) &main_screen_properties         /* extended properties            */
 };

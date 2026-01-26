@@ -32,10 +32,13 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
+#include <stdint.h>
 #include "xt_audio.h"
 #include "stm32f769i_eval_sdram.h"
 #include "tx_api.h"
 #include "xt_gui.h"
+#include "app_threadx.h"
+#include "xt_wakeword.h"
 
 /* USER CODE END Includes */
 
