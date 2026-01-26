@@ -21,7 +21,7 @@
 #include "stm32f7xx_hal.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "dp83848.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
