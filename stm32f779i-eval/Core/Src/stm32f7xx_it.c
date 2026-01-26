@@ -209,4 +209,18 @@ void AUDIO_DFSDM_DMAx_RIGHT_IRQHandler(void)
   HAL_DMA_IRQHandler(haudio_in_dfsdm_rightfilter.hdmaReg);
 }
 
+/**
+  * @brief This function handles Ethernet global interrupt.
+  */
+void ETH_IRQHandler(void)
+{
+  /* USER CODE BEGIN ETH_IRQn 0 */
+
+  /* USER CODE END ETH_IRQn 0 */
+	nx_driver_stm32f7xx_ethernet_isr();
+  /* USER CODE BEGIN ETH_IRQn 1 */
+
+  /* USER CODE END ETH_IRQn 1 */
+}
+
 /* USER CODE END 1 */

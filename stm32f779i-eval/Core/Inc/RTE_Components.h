@@ -23,6 +23,8 @@
 
 /* Defines ------------------------------------------------------------------*/
 /* STMicroelectronics.X-CUBE-AZRTOS-F7.1.1.0 */
+#define NX_ETH_INTERFACE_ENABLED
 #define THREADX_ENABLED
+#define NETXDUO_ENABLED
 
 #endif /* __RTE_COMPONENTS_H__ */
