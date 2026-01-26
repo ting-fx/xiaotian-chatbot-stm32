@@ -44,6 +44,8 @@
 
 /* USER CODE BEGIN PV */
 
+ETH_HandleTypeDef heth;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

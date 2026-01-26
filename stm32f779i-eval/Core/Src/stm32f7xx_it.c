@@ -31,6 +31,8 @@ extern SAI_HandleTypeDef haudio_out_sai;
 
 extern DFSDM_Filter_HandleTypeDef       haudio_in_dfsdm_leftfilter;
 extern DFSDM_Filter_HandleTypeDef       haudio_in_dfsdm_rightfilter;
+
+extern ETH_HandleTypeDef heth;
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -217,7 +219,7 @@ void ETH_IRQHandler(void)
   /* USER CODE BEGIN ETH_IRQn 0 */
 
   /* USER CODE END ETH_IRQn 0 */
-	nx_driver_stm32f7xx_ethernet_isr();
+	HAL_ETH_IRQHandler(&heth);
   /* USER CODE BEGIN ETH_IRQn 1 */
 
   /* USER CODE END ETH_IRQn 1 */
