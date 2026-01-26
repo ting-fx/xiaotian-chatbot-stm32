@@ -25,14 +25,14 @@ void gui_setup()
     /* 创建Touch线程  */
     tx_thread_create(&touch_thread, "GUIX Touch Thread", touch_thread_entry, 0,
                      touch_thread_stack, sizeof(touch_thread_stack),
-					 XT_CHAT_THREAD_PRIORITY - 1,
-					 XT_CHAT_THREAD_PRIORITY - 1, TX_NO_TIME_SLICE, TX_AUTO_START);
+					 XT_CHAT_THREAD_PRIORITY - 2,
+					 XT_CHAT_THREAD_PRIORITY - 2, TX_NO_TIME_SLICE, TX_AUTO_START);
 
     /* 创建GUI线程  */
     tx_thread_create(&gui_thread, "GUI Thread", gui_thread_entry, 0,
                      gui_thread_stack, sizeof(gui_thread_stack),
-					 XT_CHAT_THREAD_PRIORITY,
-					 XT_CHAT_THREAD_PRIORITY, TX_NO_TIME_SLICE, TX_AUTO_START);
+					 XT_CHAT_THREAD_PRIORITY - 1,
+					 XT_CHAT_THREAD_PRIORITY - 1, TX_NO_TIME_SLICE, TX_AUTO_START);
 }
 
 /******************************************************************************************/
