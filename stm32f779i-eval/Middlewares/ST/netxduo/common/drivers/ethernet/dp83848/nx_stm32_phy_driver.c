@@ -16,23 +16,23 @@
 
 
 /* DP83848 IO functions */
-static int32_t DP83848_io_init(void);
-static int32_t DP83848_io_deinit (void);
+static int32_t dp83848_io_init(void);
+static int32_t dp83848_io_deinit (void);
 
-static int32_t DP83848_io_write_reg(uint32_t DevAddr, uint32_t RegAddr, uint32_t RegVal);
-static int32_t DP83848_io_read_reg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal);
+static int32_t dp83848_io_write_reg(uint32_t DevAddr, uint32_t RegAddr, uint32_t RegVal);
+static int32_t dp83848_io_read_reg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal);
 
-static int32_t DP83848_io_get_tick(void);
+static int32_t dp83848_io_get_tick(void);
 
 /* DP83848 IO context object */
-static DP83848_IOCtx_t  DP83848_IOCtx = { DP83848_io_init,
-                                          DP83848_io_deinit,
-                                          DP83848_io_write_reg,
-                                          DP83848_io_read_reg,
-                                          DP83848_io_get_tick
+static dp83848_IOCtx_t  DP83848_IOCtx = { dp83848_io_init,
+                                          dp83848_io_deinit,
+                                          dp83848_io_write_reg,
+                                          dp83848_io_read_reg,
+                                          dp83848_io_get_tick
                                         };
 /* DP83848 main object */
-static DP83848_Object_t DP83848;
+static dp83848_Object_t DP83848;
 
 /**
   * @brief  Initialize the PHY interface
@@ -86,7 +86,7 @@ nx_eth_phy_handle_t nx_eth_phy_get_handle(void)
   * @retval 0 if OK, -1 if ERROR
   */
 
-int32_t DP83848_io_init(void)
+int32_t dp83848_io_init(void)
 {
   /* We assume that MDIO GPIO configuration is already done
      in the ETH_MspInit() else it should be done here
@@ -103,7 +103,7 @@ int32_t DP83848_io_init(void)
   * @param  None
   * @retval 0 if OK, -1 if ERROR
   */
-int32_t DP83848_io_deinit (void)
+int32_t dp83848_io_deinit (void)
 {
     return ETH_PHY_STATUS_OK;
 }
@@ -115,7 +115,7 @@ int32_t DP83848_io_deinit (void)
   * @param  pRegVal: pointer to hold the register value
   * @retval 0 if OK -1 if Error
   */
-int32_t DP83848_io_read_reg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal)
+int32_t dp83848_io_read_reg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal)
 {
   if(HAL_ETH_ReadPHYRegister(&eth_handle, DevAddr, RegAddr, pRegVal) != HAL_OK)
   {
@@ -125,7 +125,7 @@ int32_t DP83848_io_read_reg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVa
   return ETH_PHY_STATUS_OK;
 }
 
-int32_t DP83848_io_write_reg(uint32_t DevAddr, uint32_t RegAddr, uint32_t RegVal)
+int32_t dp83848_io_write_reg(uint32_t DevAddr, uint32_t RegAddr, uint32_t RegVal)
 {
   if(HAL_ETH_WritePHYRegister(&eth_handle, DevAddr, RegAddr, RegVal) != HAL_OK)
   {
@@ -139,7 +139,7 @@ int32_t DP83848_io_write_reg(uint32_t DevAddr, uint32_t RegAddr, uint32_t RegVal
   * @brief  Get the time in millisecons used for internal PHY driver process.
   * @retval Time value
   */
-int32_t DP83848_io_get_tick(void)
+int32_t dp83848_io_get_tick(void)
 {
   return HAL_GetTick();
 }
