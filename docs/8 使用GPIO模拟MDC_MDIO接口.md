@@ -29,20 +29,45 @@ DP83848 使用的是 **IEEE 802.3 Clause 22** 标准协议。
 
 ### 2.1 MDIO 帧格式
 
+
+下图是使用eth外设输出MDC/MDIO信号逻辑分析仪捕获的 MDC / MDIO 通信波形：
+
+![alt text](<imgs/8 MDIO_MDC_WAV.png>)
 字段说明：
 
 - **Preamble**：32 个连续的 `1`
-- **ST**：起始字段，固定为 `01`
-- **OP**：操作码  
+- **START**：起始字段，固定为 `01`
+- **OPCODE**：操作码  
   - 写：`01`  
   - 读：`10`
-- **PHYAD**：PHY 地址（5 位）
-- **REGAD**：寄存器地址（5 位）
-- **TA**：Turnaround，方向切换
+- **PHY Address**：PHY 地址（5 位）
+- **Register Address**：寄存器地址（5 位）
+- **Turnaround**：方向切换
 - **DATA**：16 位寄存器数据
+
+### 2.2 写寄存器流程
+
+- 发送 Preamble
+- 发送 Start + Opcode
+- 发送 PHY 地址
+- 发送寄存器地址
+- 发送 Turnaround
+- 发送 16 位数据
+
+### 2.3 读寄存器流程
+
+- 发送 Preamble
+- 发送 Start + Opcode
+- 发送 PHY 地址
+- 发送寄存器地址
+- 切换 MDIO 为输入
+- 读取 16 位数据
+
+整个过程完全符合 IEEE 802.3 Clause 22 规范。
 
 ## 3 开发板跳线配置
 
+因为 STM32F779I-EVAL 板上 **PC1 / PA2** 引脚和audio codec冲突，我们需要使用audio codec播放声音，所以这边在phy侧将MDC和MDIO连接到PJ13和PJ12引脚。通过GPIO模拟MDC/MDIO接口。下面是跳线配置：
 ![alt text](<imgs/7 添加NetXDuo-7-JP4-JP8-Jumpers.png>)
 
 * **JP4 → 2–3**
@@ -50,6 +75,7 @@ DP83848 使用的是 **IEEE 802.3 Clause 22** 标准协议。
 
 ## 4 代码实现
 
+### 代码实现
 ```c
 /**************************************************************************/
 /*                                                                        */
@@ -67,11 +93,11 @@ DP83848 使用的是 **IEEE 802.3 Clause 22** 标准协议。
 /* ===================================================================== */
 
 /* 请根据实际硬件电路修改引脚定义 */
-#define MDC_GPIO_Port   GPIOB
-#define MDC_Pin         GPIO_PIN_1
+#define MDC_GPIO_Port   GPIOJ
+#define MDC_Pin         GPIO_PIN_13
 
-#define MDIO_GPIO_Port  GPIOB
-#define MDIO_Pin        GPIO_PIN_2
+#define MDIO_GPIO_Port  GPIOJ
+#define MDIO_Pin        GPIO_PIN_12
 
 /* ===================================================================== */
 /* ======================= GPIO OPERATIONS ============================== */
@@ -289,25 +315,5 @@ nx_eth_phy_handle_t nx_eth_phy_get_handle(void)
     return (nx_eth_phy_handle_t)&DP83848;
 }
 ```
-
-## 5 PHY 寄存器读写流程
-
-### 5.1 写寄存器流程
-
-- 发送 Preamble
-- 发送 Start + Opcode
-- 发送 PHY 地址
-- 发送寄存器地址
-- 发送 Turnaround
-- 发送 16 位数据
-
-### 5.2 读寄存器流程
-
-- 发送 Preamble
-- 发送 Start + Opcode
-- 发送 PHY 地址
-- 发送寄存器地址
-- 切换 MDIO 为输入
-- 读取 16 位数据
-
-整个过程完全符合 IEEE 802.3 Clause 22 规范。
+### 逻辑分析仪波形
+![alt text](<imgs/8 MDIO_MDC_WAV2.png>)

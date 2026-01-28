@@ -36,7 +36,7 @@
 ## 2 替换 PHY 驱动（LAN8742 → DP83848）
 
 ![ethernet hal文件](<imgs/7 添加NetXDuo-4-替换phy.png>)
-
+![alt text](<imgs/7 添加NetXDuo-4-替换phy2.png>)
 操作步骤：
 
 * 添加 **DP83848 BSP 驱动文件**
@@ -132,9 +132,12 @@ UINT MX_NetXDuo_Init(VOID *memory_ptr)
 
 ## 5 STM32F779I-EVAL 跳线配置
 
+![alt text](<imgs/7 添加NetXDuo-8-跳线配置.png>)
+
 STM32F779I-EVAL 板上，**MCU 的 PC1 / PA2** 信号可通过跳线在不同外设之间切换。
 
 本例中选择将 **MCU 的 PC1 / PA2** 连接到 **以太网 PHY（DP83848）**。
+
 
 ### 5.1 MCU 侧跳线配置
 
@@ -169,14 +172,12 @@ STM32F779I-EVAL 板上，**MCU 的 PC1 / PA2** 信号可通过跳线在不同外
 
 插入网线，在 PC 端对开发板 IP 地址进行 `ping` 测试：
 
-![alt text](<imgs/7 添加NetXDuo-5-测试.png>)
+![alt text](<imgs/7 添加NetXDuo-9-测试.png>)
 
 若能够收到正常回复，说明：
 
 * NetXDuo 初始化成功
 * STM32 ETH MAC 工作正常
 * DP83848 PHY 通信与链路建立正常
-
----
 
 至此，**STM32F779I-EVAL + NetXDuo + DP83848** 的基础以太网环境搭建完成。
