@@ -149,7 +149,7 @@ STM32F779I-EVAL 板上，**MCU 的 PC1 / PA2** 信号可通过跳线在不同外
 ![alt text](<imgs/7 添加NetXDuo-7-JP4-JP8-Jumpers.png>)
 
 * **JP4 → 2–3**
-* **JP8 → 2–3**
+* **JP8 → 1–2**
 
 
 ### 5.3 MDC / MDIO 说明
