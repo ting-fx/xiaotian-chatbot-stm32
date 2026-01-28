@@ -47,24 +47,6 @@ MDIO接口主要在 PHY 上电或复位后的初始化阶段使用，在正常�
 - **Turnaround**：方向切换
 - **DATA**：16 位寄存器数据
 
-### 2.2 写寄存器流程
-
-- 发送 Preamble
-- 发送 Start + Opcode
-- 发送 PHY 地址
-- 发送寄存器地址
-- 发送 Turnaround
-- 发送 16 位数据
-
-### 2.3 读寄存器流程
-
-- 发送 Preamble
-- 发送 Start + Opcode
-- 发送 PHY 地址
-- 发送寄存器地址
-- 切换 MDIO 为输入
-- 读取 16 位数据
-
 ## 3 MII / RMII接口：传输以太网数据
 
 MII（Media Independent Interface） 是一种标准化的数据接口，用于连接 MAC 与 PHY，负责以太网数据的实际传输。
@@ -73,13 +55,13 @@ MII（Media Independent Interface） 是一种标准化的数据接口，用于�
 RMII（Reduced MII） 是 MII 的简化版本，通过减少信号线数量来降低引脚占用，更适合引脚资源受限的 MCU 设计。
 
 ## 4 为什么使用 GPIO 模拟 MDIO 接口？
-在大多数情况下，STM32 内部的 **ETH 外设** 可以直接提供硬件 MDIO 支持。然而，在某些情况下（例如硬件引脚与音频编解码器等其他外设冲突），硬件MDIO 引脚可能无法使用。此时，通过 GPIO 模拟 / MDIO 接口便成为一种可行的替代方案。
+在大多数情况下，STM32 内部的 **ETH 外设** 可以直接提供硬件 MDIO 支持。然而，在某些情况下（例如硬件引脚与音频编解码器等其他外设冲突），硬件MDIO 引脚可能无法使用。此时，通过 GPIO 模拟 MDIO 接口便成为一种可行的替代方案。
 
 
 ## 5 开发板跳线配置
 
 以 STM32F779I-EVAL 开发板为例。
-由于默认的 PC1/PA2 与音频编解码器冲突，这里将 PHY 的 MDC / MDIO 信号重新连接到：
+由于默认的 PC1/PA2 与音频编解码器冲突，这里将 PHY 的 MDC / MDIO 信号连接到：
 - PJ13 → MDC
 - PJ12 → MDIO
 
@@ -297,6 +279,6 @@ nx_eth_phy_handle_t nx_eth_phy_get_handle(void)
     return (nx_eth_phy_handle_t)&DP83848;
 }
 ```
-### 5.5 逻辑分析仪波形
+### 6.5 逻辑分析仪波形
 
 ![alt text](<imgs/8 MDIO_MDC_WAV2.png>)
