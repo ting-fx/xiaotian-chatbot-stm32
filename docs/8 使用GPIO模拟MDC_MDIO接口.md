@@ -1,36 +1,38 @@
-# 使用 GPIO 模拟 MDC / MDIO 接口  
+# 使用 GPIO 模拟 MDIO 接口配置以太网 PHY  
+
+本文将以 **STM32F779 + DP83848 + NetXDuo** 为例，介绍如何通过 GPIO 模拟MDIO接口，完成以太网PHY的初始化与配置。
 
 在 STM32 以太网应用中，MCU 与 PHY 芯片之间通常通过两类接口通信：
 
-- **数据接口**：MII / RMII，用于收发以太网数据帧  
-- **管理接口**：MDC / MDIO，用于配置和管理 PHY 寄存器  
+- MDIO： 用于读写 PHY 内部寄存器  
+- MII / RMII：用于收发以太网数据帧 
 
-在大多数情况下，STM32 内部的 **ETH 外设** 可以直接提供硬件 MDC / MDIO 支持。但是由于引脚和audio codec冲突，这边通过 GPIO 模拟 MDC / MDIO 接口成为了一种可行的替代方案。
+## 1. PHY 简介
 
-本文将以 **STM32F779 + DP83848 + NetXDuo** 为例，介绍如何通过 GPIO 模拟 MDC / MDIO，并成功驱动以太网 PHY 工作。
+PHY（Physical Layer）属于以太网 物理层，主要负责完成以下功能：
 
-## 1 什么是 MDC 和 MDIO？
+- 模拟信号与数字信号之间的转换
+- 以太网链路的建立与维护
+- 自动协商速率（10M / 100M）、双工模式（全双工 / 半双工）等
 
-MDC / MDIO 是 IEEE 802.3 定义的 **PHY 管理接口（MIIM）**。
+MCU 内部通常集成 MAC（媒体访问控制）层，而 PHY 则作为外部芯片，通过接口与 MAC 相连。
 
-| 信号 | 方向 | 说明 |
-|----|----|----|
-| MDC | MCU → PHY | 管理接口时钟 |
-| MDIO | 双向 | 管理接口数据 |
+## 2 MDIO 接口
 
-需要注意的是：
+MDIO接口是一种双线串行总线。由时钟信号线MDC和数据信号线MDIO组成，用于MAC与PHY之间的通信，主要是用于读写PHY内部寄存器，不传输以太网数据。
 
-- MDC / MDIO **不传输以太网数据**
-- 仅用于 **读写 PHY 内部寄存器**
+MDIO接口主要在 PHY 上电或复位后的初始化阶段使用，在正常的数据通信过程中访问频率较低。
 
-## 2 MDIO 通信协议（Clause 22）
+根据 IEEE 802.3 协议中将MDIO分为两种帧格式：
 
-DP83848 使用的是 **IEEE 802.3 Clause 22** 标准协议。
+- Clause 22：最常用格式，适用于大多数 10M / 100M PHY
+- Clause 45：Clause 22 的扩展版本，支持更多寄存器，主要用于高速以太网 PHY
 
-### 2.1 MDIO 帧格式
+本文所使用的 DP83848 采用的是 IEEE 802.3 Clause 22 协议。
 
+### 2.1 MDIO 帧格式（Clause 22）
 
-下图是使用eth外设输出MDC/MDIO信号逻辑分析仪捕获的 MDC / MDIO 通信波形：
+下图为使用 STM32 ETH 外设输出 MDC / MDIO 信号，通过逻辑分析仪捕获的通信波形：
 
 ![alt text](<imgs/8 MDIO_MDC_WAV.png>)
 字段说明：
@@ -63,45 +65,36 @@ DP83848 使用的是 **IEEE 802.3 Clause 22** 标准协议。
 - 切换 MDIO 为输入
 - 读取 16 位数据
 
-整个过程完全符合 IEEE 802.3 Clause 22 规范。
+## 3 MII / RMII接口：传输以太网数据
 
-## 3 开发板跳线配置
+MII（Media Independent Interface） 是一种标准化的数据接口，用于连接 MAC 与 PHY，负责以太网数据的实际传输。
+由于其标准化特性，同一 MAC 可以适配多种不同型号的 PHY 芯片。
 
-因为 STM32F779I-EVAL 板上 **PC1 / PA2** 引脚和audio codec冲突，我们需要使用audio codec播放声音，所以这边在phy侧将MDC和MDIO连接到PJ13和PJ12引脚。通过GPIO模拟MDC/MDIO接口。下面是跳线配置：
+RMII（Reduced MII） 是 MII 的简化版本，通过减少信号线数量来降低引脚占用，更适合引脚资源受限的 MCU 设计。
+
+## 4 为什么使用 GPIO 模拟 MDIO 接口？
+在大多数情况下，STM32 内部的 **ETH 外设** 可以直接提供硬件 MDIO 支持。然而，在某些情况下（例如硬件引脚与音频编解码器等其他外设冲突），硬件MDIO 引脚可能无法使用。此时，通过 GPIO 模拟 / MDIO 接口便成为一种可行的替代方案。
+
+
+## 5 开发板跳线配置
+
+以 STM32F779I-EVAL 开发板为例。
+由于默认的 PC1/PA2 与音频编解码器冲突，这里将 PHY 的 MDC / MDIO 信号重新连接到：
+- PJ13 → MDC
+- PJ12 → MDIO
+
+通过GPIO模拟MDIO接口。下面是跳线配置：
 ![alt text](<imgs/7 添加NetXDuo-7-JP4-JP8-Jumpers.png>)
 
 * **JP4 → 2–3**
 * **JP8 → 2–3**
 
-## 4 代码实现
+## 6 代码实现
 
-### 代码实现
+以下代码实现了基于 DP83848 的 MDIO 模拟驱动，并完成了与 Azure RTOS NetXDuo PHY 驱动接口的适配。
+
+### 6.1 基础操作与时序
 ```c
-/**************************************************************************/
-/*                                                                        */
-/*  GPIO Bit-Bang MDC / MDIO driver for DP83848 (Clause 22)               */
-/*  Target: STM32F7 Series                                                */
-/*                                                                        */
-/**************************************************************************/
-
-#include "stm32f7xx_hal.h"
-#include "nx_stm32_phy_driver.h"
-#include "nx_stm32_eth_config.h"
-
-/* ===================================================================== */
-/* ======================= GPIO CONFIGURATION ========================== */
-/* ===================================================================== */
-
-/* 请根据实际硬件电路修改引脚定义 */
-#define MDC_GPIO_Port   GPIOJ
-#define MDC_Pin         GPIO_PIN_13
-
-#define MDIO_GPIO_Port  GPIOJ
-#define MDIO_Pin        GPIO_PIN_12
-
-/* ===================================================================== */
-/* ======================= GPIO OPERATIONS ============================== */
-/* ===================================================================== */
 
 #define MDC_HIGH()      HAL_GPIO_WritePin(MDC_GPIO_Port, MDC_Pin, GPIO_PIN_SET)
 #define MDC_LOW()       HAL_GPIO_WritePin(MDC_GPIO_Port, MDC_Pin, GPIO_PIN_RESET)
@@ -110,10 +103,6 @@ DP83848 使用的是 **IEEE 802.3 Clause 22** 标准协议。
 #define MDIO_LOW()      HAL_GPIO_WritePin(MDIO_GPIO_Port, MDIO_Pin, GPIO_PIN_RESET)
 #define MDIO_READ()     HAL_GPIO_ReadPin(MDIO_GPIO_Port, MDIO_Pin)
 
-/* ===================================================================== */
-/* ======================= DELAY (MDC CLOCK) ============================ */
-/* ===================================================================== */
-
 /* STM32F7 主频较高，增加延迟以确保频率在 1MHz - 2.5MHz 之间 */
 static void mdio_delay(void)
 {
@@ -121,10 +110,6 @@ static void mdio_delay(void)
         __asm("NOP");
     }
 }
-
-/* ===================================================================== */
-/* ======================= MDIO DIRECTION =============================== */
-/* ===================================================================== */
 
 static void mdio_set_output(void)
 {
@@ -144,11 +129,11 @@ static void mdio_set_input(void)
     GPIO_InitStruct.Pull = GPIO_PULLUP; /* 使用内部上拉增强空闲状态稳定性 */
     HAL_GPIO_Init(MDIO_GPIO_Port, &GPIO_InitStruct);
 }
+```
 
-/* ===================================================================== */
-/* ======================= BIT OPERATIONS =============================== */
-/* ===================================================================== */
+### 6.2 读写核心逻辑
 
+```c
 /* 写一位数据：在 MDC 上升沿前准备数据，PHY 在上升沿采样 */
 static void mdio_write_bit(uint8_t bit)
 {
@@ -183,11 +168,10 @@ static void mdio_send_preamble(void)
         mdio_write_bit(1);
     }
 }
+```
 
-/* ===================================================================== */
-/* ======================= PHY IO FUNCTIONS ============================= */
-/* ===================================================================== */
-
+### 6.3 PHY 驱动接口实现
+```c
 static int32_t dp83848_io_init(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -278,11 +262,9 @@ static int32_t dp83848_io_get_tick(void)
 {
     return (int32_t)HAL_GetTick();
 }
-
-/* ===================================================================== */
-/* ======================= Azure RTOS Interface ======================== */
-/* ===================================================================== */
-
+```
+### 6.4 PHY 驱动适配 NetXDuo
+```c
 static dp83848_Object_t DP83848;
 
 static dp83848_IOCtx_t DP83848_IOCtx =
@@ -315,5 +297,6 @@ nx_eth_phy_handle_t nx_eth_phy_get_handle(void)
     return (nx_eth_phy_handle_t)&DP83848;
 }
 ```
-### 逻辑分析仪波形
+### 5.5 逻辑分析仪波形
+
 ![alt text](<imgs/8 MDIO_MDC_WAV2.png>)
