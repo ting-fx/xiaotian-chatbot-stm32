@@ -14,11 +14,11 @@
 /* ===================================================================== */
 
 /* 请根据实际硬件电路修改引脚定义 */
-#define MDC_GPIO_Port   GPIOB
-#define MDC_Pin         GPIO_PIN_1
+#define MDC_GPIO_Port   GPIOJ
+#define MDC_Pin         GPIO_PIN_13
 
-#define MDIO_GPIO_Port  GPIOB
-#define MDIO_Pin        GPIO_PIN_2
+#define MDIO_GPIO_Port  GPIOJ
+#define MDIO_Pin        GPIO_PIN_12
 
 /* ===================================================================== */
 /* ======================= GPIO OPERATIONS ============================== */
