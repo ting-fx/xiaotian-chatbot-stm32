@@ -283,8 +283,6 @@ void Error_Handler(void);
 #define D13_GPIO_Port GPIOD
 #define ULPI_STP_Pin GPIO_PIN_0
 #define ULPI_STP_GPIO_Port GPIOC
-#define SAI1_SDA_Pin GPIO_PIN_1
-#define SAI1_SDA_GPIO_Port GPIOC
 #define MII_TXD2_Pin GPIO_PIN_2
 #define MII_TXD2_GPIO_Port GPIOC
 #define QSPI_CLK_Pin GPIO_PIN_2
@@ -309,10 +307,6 @@ void Error_Handler(void);
 #define LCD_R6_GPIO_Port GPIOJ
 #define D20_Pin GPIO_PIN_12
 #define D20_GPIO_Port GPIOH
-#define MII_RX_CLK_Pin GPIO_PIN_1
-#define MII_RX_CLK_GPIO_Port GPIOA
-#define SAI2_SDB_Pin GPIO_PIN_0
-#define SAI2_SDB_GPIO_Port GPIOA
 #define PAR_HSYNC_Pin GPIO_PIN_4
 #define PAR_HSYNC_GPIO_Port GPIOA
 #define MII_RXD0_Pin GPIO_PIN_4
@@ -337,8 +331,6 @@ void Error_Handler(void);
 #define D17_GPIO_Port GPIOH
 #define D19_Pin GPIO_PIN_11
 #define D19_GPIO_Port GPIOH
-#define SAI2_SCKB_Pin GPIO_PIN_2
-#define SAI2_SCKB_GPIO_Port GPIOA
 #define PAR_PCLK_Pin GPIO_PIN_6
 #define PAR_PCLK_GPIO_Port GPIOA
 #define ULPI_CK_Pin GPIO_PIN_5
@@ -365,10 +357,6 @@ void Error_Handler(void);
 #define D16_GPIO_Port GPIOH
 #define D18_Pin GPIO_PIN_10
 #define D18_GPIO_Port GPIOH
-#define ULPI_D0_Pin GPIO_PIN_3
-#define ULPI_D0_GPIO_Port GPIOA
-#define MII_RX_DV_Pin GPIO_PIN_7
-#define MII_RX_DV_GPIO_Port GPIOA
 #define ULPI_D2_Pin GPIO_PIN_1
 #define ULPI_D2_GPIO_Port GPIOB
 #define ULPI_D1_Pin GPIO_PIN_0
